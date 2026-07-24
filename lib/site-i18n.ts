@@ -67,9 +67,28 @@ export type SitePage = keyof typeof PAGE_METADATA
 
 const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xingniang.app'
 
+export function siteName(language: SiteLanguage) {
+  return language === 'zh'
+    ? '星酿启动器 (AstraBrew Launcher)'
+    : 'AstraBrew Launcher (星酿启动器)'
+}
+
+export function openGraphImage(language: SiteLanguage) {
+  return {
+    url: '/images/og.png',
+    width: 1200,
+    height: 630,
+    type: 'image/png',
+    alt: language === 'zh'
+      ? '星酿启动器，一站式 SillyTavern 启动与管理工具'
+      : 'AstraBrew Launcher, an all-in-one SillyTavern launcher and manager',
+  }
+}
+
 export function createPageMetadata(language: SiteLanguage, page: SitePage): Metadata {
   const content = PAGE_METADATA[page][language]
   const pagePath = page === 'home' ? '/' : `/${page}`
+  const image = openGraphImage(language)
 
   return {
     title: content.title,
@@ -83,10 +102,20 @@ export function createPageMetadata(language: SiteLanguage, page: SitePage): Meta
       },
     },
     openGraph: {
+      type: 'website',
       locale: language === 'zh' ? 'zh_CN' : 'en_US',
+      alternateLocale: language === 'zh' ? ['en_US'] : ['zh_CN'],
+      siteName: siteName(language),
       title: content.title,
       description: content.description,
       url: new URL(localizedPath(language, pagePath), siteOrigin),
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.title,
+      description: content.description,
+      images: [image],
     },
   }
 }

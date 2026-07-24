@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
 import { Noto_Sans_SC, Inter } from 'next/font/google'
-import { isSiteLanguage, SITE_LANGUAGES, type SiteLanguage } from '@/lib/site-i18n'
+import { Analytics } from '@vercel/analytics/next'
+import {
+  isSiteLanguage,
+  openGraphImage,
+  SITE_LANGUAGES,
+  siteName,
+  type SiteLanguage,
+} from '@/lib/site-i18n'
 import '../../globals.css'
 
 const notoSansSC = Noto_Sans_SC({
@@ -29,17 +36,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   if (!isSiteLanguage(lang)) notFound()
 
   const language = lang as SiteLanguage
+  const title = siteName(language)
+  const description = language === 'zh'
+    ? '星酿启动器 —— 面向新手的 SillyTavern 一站式启动与管理工具，支持 Windows 与 macOS。'
+    : 'A beginner-friendly SillyTavern launcher and manager for Windows and macOS.'
+  const image = openGraphImage(language)
+
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xingniang.app'),
     title: {
-      default: language === 'zh'
-        ? '星酿启动器 (AstraBrew Launcher)'
-        : 'AstraBrew Launcher (星酿启动器)',
+      default: title,
       template: '%s',
     },
-    description: language === 'zh'
-      ? '星酿启动器 —— 面向新手的 SillyTavern 一站式启动与管理工具，支持 Windows 与 macOS。'
-      : 'A beginner-friendly SillyTavern launcher and manager for Windows and macOS.',
+    description,
     keywords: language === 'zh'
       ? ['星酿启动器', '酒馆启动器', 'SillyTavern', '环境配置', '实例管理', 'Windows', 'macOS']
       : ['AstraBrew Launcher', 'SillyTavern launcher', 'instance manager', 'Windows', 'macOS'],
@@ -47,16 +56,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     creator: language === 'zh' ? '星酿团队' : 'AstraBrew Team',
     openGraph: {
       type: 'website',
+      title,
+      description,
+      url: `/${language}`,
       locale: language === 'zh' ? 'zh_CN' : 'en_US',
       alternateLocale: language === 'zh' ? ['en_US'] : ['zh_CN'],
-      siteName: language === 'zh'
-        ? '星酿启动器 (AstraBrew Launcher)'
-        : 'AstraBrew Launcher (星酿启动器)',
-      images: [{ url: '/images/og.png', width: 1200, height: 630 }],
+      siteName: title,
+      images: [image],
     },
     twitter: {
       card: 'summary_large_image',
-      images: ['/images/og.png'],
+      title,
+      description,
+      images: [image],
     },
     icons: {
       icon: [
@@ -103,6 +115,7 @@ export default async function LocalizedRootLayout({
     >
       <body className="font-sans antialiased bg-background text-foreground">
         {children}
+        <Analytics />
       </body>
     </html>
   )
