@@ -1,0 +1,109 @@
+import type { Metadata, Viewport } from 'next'
+import { notFound } from 'next/navigation'
+import { Noto_Sans_SC, Inter } from 'next/font/google'
+import { isSiteLanguage, SITE_LANGUAGES, type SiteLanguage } from '@/lib/site-i18n'
+import '../../globals.css'
+
+const notoSansSC = Noto_Sans_SC({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700', '900'],
+  variable: '--font-noto',
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+export const dynamicParams = false
+
+export function generateStaticParams() {
+  return SITE_LANGUAGES.map((lang) => ({ lang }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!isSiteLanguage(lang)) notFound()
+
+  const language = lang as SiteLanguage
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xingniang.app'),
+    title: {
+      default: language === 'zh'
+        ? '星酿启动器 (AstraBrew Launcher)'
+        : 'AstraBrew Launcher (星酿启动器)',
+      template: '%s',
+    },
+    description: language === 'zh'
+      ? '星酿启动器 —— 面向新手的 SillyTavern 一站式启动与管理工具，支持 Windows 与 macOS。'
+      : 'A beginner-friendly SillyTavern launcher and manager for Windows and macOS.',
+    keywords: language === 'zh'
+      ? ['星酿启动器', '酒馆启动器', 'SillyTavern', '环境配置', '实例管理', 'Windows', 'macOS']
+      : ['AstraBrew Launcher', 'SillyTavern launcher', 'instance manager', 'Windows', 'macOS'],
+    authors: [{ name: language === 'zh' ? '星酿团队' : 'AstraBrew Team' }],
+    creator: language === 'zh' ? '星酿团队' : 'AstraBrew Team',
+    openGraph: {
+      type: 'website',
+      locale: language === 'zh' ? 'zh_CN' : 'en_US',
+      alternateLocale: language === 'zh' ? ['en_US'] : ['zh_CN'],
+      siteName: language === 'zh'
+        ? '星酿启动器 (AstraBrew Launcher)'
+        : 'AstraBrew Launcher (星酿启动器)',
+      images: [{ url: '/images/og.png', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: ['/images/og.png'],
+    },
+    icons: {
+      icon: [
+        { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+        { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+        { url: '/images/logo.png', type: 'image/png' },
+      ],
+      shortcut: '/icon-light-32x32.png',
+      apple: '/apple-icon.png',
+    },
+  }
+}
+
+export const viewport: Viewport = {
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0D1520' },
+    { media: '(prefers-color-scheme: light)', color: '#F4F8FA' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+}
+
+export default async function LocalizedRootLayout({
+  children,
+  params,
+}: Readonly<{
+  children: React.ReactNode
+  params: Promise<{ lang: string }>
+}>) {
+  const { lang } = await params
+  if (!isSiteLanguage(lang)) notFound()
+
+  const language = lang as SiteLanguage
+
+  return (
+    <html
+      lang={language === 'zh' ? 'zh-CN' : 'en'}
+      className={`${notoSansSC.variable} ${inter.variable} dark bg-background`}
+      data-theme="dark"
+      data-language={language}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <body className="font-sans antialiased bg-background text-foreground">
+        {children}
+      </body>
+    </html>
+  )
+}

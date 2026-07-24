@@ -1,0 +1,358 @@
+@import 'tailwindcss';
+@import '@heroui/styles';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   星酿启动器 · 设计系统 · Design Tokens
+   洛天依蓝 #7EC8E3 · 初音Miku绿 #39C5BB
+   ============================================================ */
+
+@theme inline {
+  /* --- 字体 --- */
+  --font-sans: var(--font-noto), var(--font-inter), 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* --- 基础颜色 --- */
+  --color-background:       var(--background);
+  --color-foreground:       var(--foreground);
+  --color-card:             var(--card);
+  --color-card-foreground:  var(--card-foreground);
+  --color-surface:          var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-muted:            var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border:           var(--border);
+  --color-ring:             var(--ring);
+  --color-input:            var(--input);
+
+  /* --- 品牌色 --- */
+  --color-primary:          var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:        var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent:           var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive:      var(--destructive);
+
+  /* --- 星酿专属品牌色 --- */
+  --color-tianyi:           var(--tianyi);
+  --color-miku:             var(--miku);
+  --color-gradient-from:    var(--gradient-from);
+  --color-gradient-to:      var(--gradient-to);
+  --color-glow-tianyi:      var(--glow-tianyi);
+  --color-glow-miku:        var(--glow-miku);
+
+  /* --- 圆角 --- */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+}
+
+/* ============================================================
+   深色主题（默认）
+   ============================================================ */
+:root {
+  color-scheme: dark;
+
+  /* 深邃夜空背景 */
+  --background:           oklch(0.09 0.018 228);
+  --foreground:           oklch(0.94 0.01 210);
+
+  /* 卡片/表面 */
+  --card:                 oklch(0.13 0.02 224);
+  --card-foreground:      oklch(0.94 0.01 210);
+  --surface:              oklch(0.16 0.022 222);
+  --surface-foreground:   oklch(0.90 0.01 210);
+
+  /* 静音色 */
+  --muted:                oklch(0.20 0.025 222);
+  --muted-foreground:     oklch(0.62 0.04 218);
+
+  /* 边框 */
+  --border:               oklch(0.30 0.04 218 / 0.55);
+  --input:                oklch(0.22 0.03 220);
+  --ring:                 oklch(0.73 0.10 212 / 0.6);
+
+  /* 主色 · 洛天依蓝 */
+  --primary:              oklch(0.74 0.10 212);
+  --primary-foreground:   oklch(0.08 0.015 225);
+
+  /* 次色 · Miku绿 */
+  --secondary:            oklch(0.70 0.12 188);
+  --secondary-foreground: oklch(0.08 0.015 225);
+
+  /* 强调色 */
+  --accent:               oklch(0.72 0.11 196);
+  --accent-foreground:    oklch(0.08 0.015 225);
+  --destructive:          oklch(0.65 0.22 22);
+
+  /* 品牌专属 */
+  --tianyi:               oklch(0.74 0.10 212);    /* 洛天依蓝 */
+  --miku:                 oklch(0.70 0.12 188);    /* Miku绿 */
+  --gradient-from:        oklch(0.73 0.11 210);
+  --gradient-to:          oklch(0.69 0.13 185);
+  --glow-tianyi:          oklch(0.74 0.10 212 / 0.35);
+  --glow-miku:            oklch(0.70 0.12 188 / 0.35);
+  --brand-blue-text:      oklch(0.80 0.09 212);
+  --brand-green-text:     oklch(0.76 0.11 188);
+  --warning-text:         oklch(0.80 0.12 55);
+
+  --radius: 0.75rem;
+}
+
+/* ============================================================
+   浅色主题
+   ============================================================ */
+.light {
+  color-scheme: light;
+
+  --background:           oklch(0.97 0.01 218);
+  --foreground:           oklch(0.12 0.02 225);
+
+  --card:                 oklch(0.99 0.005 218);
+  --card-foreground:      oklch(0.12 0.02 225);
+  --surface:              oklch(0.94 0.015 218);
+  --surface-foreground:   oklch(0.15 0.02 225);
+
+  --muted:                oklch(0.90 0.02 218);
+  --muted-foreground:     oklch(0.48 0.04 220);
+
+  --border:               oklch(0.82 0.04 215 / 0.7);
+  --input:                oklch(0.90 0.02 218);
+  --ring:                 oklch(0.73 0.10 212 / 0.5);
+
+  --primary:              oklch(0.58 0.12 212);
+  --primary-foreground:   oklch(0.98 0 0);
+
+  --secondary:            oklch(0.56 0.13 188);
+  --secondary-foreground: oklch(0.98 0 0);
+
+  --accent:               oklch(0.60 0.12 196);
+  --accent-foreground:    oklch(0.98 0 0);
+  --destructive:          oklch(0.57 0.24 27);
+
+  --tianyi:               oklch(0.58 0.12 212);
+  --miku:                 oklch(0.56 0.13 188);
+  --gradient-from:        oklch(0.57 0.12 210);
+  --gradient-to:          oklch(0.55 0.13 184);
+  --glow-tianyi:          oklch(0.58 0.12 212 / 0.25);
+  --glow-miku:            oklch(0.56 0.13 188 / 0.25);
+  --brand-blue-text:      oklch(0.48 0.13 212);
+  --brand-green-text:     oklch(0.44 0.13 188);
+  --warning-text:         oklch(0.48 0.13 55);
+}
+
+/* ============================================================
+   基础全局样式
+   ============================================================ */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  html[data-language='en'] body {
+    font-family: var(--font-inter), var(--font-noto), 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  ::selection {
+    background-color: oklch(0.73 0.10 212 / 0.35);
+    color: oklch(0.94 0.01 210);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(0.11 0.016 226);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.30 0.06 215);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.50 0.09 212);
+  }
+
+  html.light ::-webkit-scrollbar-track {
+    background: oklch(0.94 0.015 218);
+  }
+
+  html.light ::-webkit-scrollbar-thumb {
+    background: oklch(0.70 0.05 215);
+  }
+}
+
+/* ============================================================
+   通用工具类
+   ============================================================ */
+@layer utilities {
+
+  /* 品牌渐变文字 */
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--accent) 40%,
+      var(--secondary) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 品牌渐变背景 */
+  .bg-brand-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(0.73 0.11 210) 0%,
+      oklch(0.69 0.13 185) 100%
+    );
+  }
+
+  /* 微妙渐变背景（用于区块） */
+  .bg-section-gradient {
+    background: radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      oklch(0.73 0.10 212 / 0.12) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 80% 80%,
+      oklch(0.70 0.12 188 / 0.08) 0%,
+      transparent 50%
+    );
+  }
+
+  /* 玻璃态卡片 */
+  .glass-card {
+    background: color-mix(in oklch, var(--card) 86%, transparent);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    border: 1px solid var(--border);
+  }
+
+  /* 发光按钮边框 */
+  .glow-border-tianyi {
+    box-shadow:
+      0 0 0 1px oklch(0.74 0.10 212 / 0.5),
+      0 0 16px oklch(0.74 0.10 212 / 0.2),
+      inset 0 0 16px oklch(0.74 0.10 212 / 0.05);
+  }
+
+  .glow-border-miku {
+    box-shadow:
+      0 0 0 1px oklch(0.70 0.12 188 / 0.5),
+      0 0 16px oklch(0.70 0.12 188 / 0.2),
+      inset 0 0 16px oklch(0.70 0.12 188 / 0.05);
+  }
+
+  /* 霓虹光效 */
+  .neon-glow-tianyi {
+    text-shadow:
+      0 0 10px oklch(0.80 0.12 210 / 0.8),
+      0 0 30px oklch(0.74 0.10 212 / 0.5),
+      0 0 60px oklch(0.74 0.10 212 / 0.3);
+  }
+
+  .neon-glow-miku {
+    text-shadow:
+      0 0 10px oklch(0.80 0.14 188 / 0.8),
+      0 0 30px oklch(0.70 0.12 188 / 0.5),
+      0 0 60px oklch(0.70 0.12 188 / 0.3);
+  }
+
+  /* 星空背景 */
+  .starfield {
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, oklch(0.90 0 0 / 0.7), transparent),
+      radial-gradient(1px 1px at 80% 20%, oklch(0.90 0 0 / 0.5), transparent),
+      radial-gradient(1px 1px at 40% 70%, oklch(0.90 0 0 / 0.6), transparent),
+      radial-gradient(2px 2px at 60% 50%, oklch(0.90 0 0 / 0.4), transparent),
+      radial-gradient(1px 1px at 10% 80%, oklch(0.90 0 0 / 0.5), transparent),
+      radial-gradient(1px 1px at 90% 60%, oklch(0.90 0 0 / 0.6), transparent),
+      radial-gradient(2px 2px at 30% 10%, oklch(0.90 0 0 / 0.4), transparent);
+    background-size: 400px 400px;
+  }
+
+  /* 渐变边框 */
+  .border-gradient {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      oklch(0.74 0.10 212 / 0.6),
+      oklch(0.70 0.12 188 / 0.6)
+    );
+    z-index: -1;
+  }
+
+  /* 光圈动画 */
+  .pulse-ring {
+    animation: pulse-ring 2.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 oklch(0.73 0.10 212 / 0.4); }
+    70% { box-shadow: 0 0 0 15px oklch(0.73 0.10 212 / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(0.73 0.10 212 / 0); }
+  }
+
+  /* 浮动动画 */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* 扫光动画 */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(1 0 0 / 0.08) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
