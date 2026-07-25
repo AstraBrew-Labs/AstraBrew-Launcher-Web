@@ -65,7 +65,7 @@ const PAGE_METADATA = {
 
 export type SitePage = keyof typeof PAGE_METADATA
 
-const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xingniang.app'
+const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://launcher.astrabrew.cn'
 
 export function siteName(language: SiteLanguage) {
   return language === 'zh'

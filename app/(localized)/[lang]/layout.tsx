@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const image = openGraphImage(language)
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xingniang.app'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://launcher.astrabrew.cn'),
     title: {
       default: title,
       template: '%s',

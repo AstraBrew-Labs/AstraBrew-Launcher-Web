@@ -18,6 +18,7 @@ import { useReleases } from '@/hooks/use-releases'
 import { HelpContent, HelpTip } from '@/components/help-content'
 import { useSitePreferences } from '@/components/site-preferences'
 import { getInstallationFaqItems } from '@/lib/installation-faq'
+import { localizedPath, siteUrl } from '@/lib/site-i18n'
 import {
   describeReleaseAsset,
   formatFileSize,
@@ -346,6 +347,7 @@ export default function DownloadPage() {
   const currentBetaRelease = data?.latestBeta[activeOS] ?? null
   const platformReleases = data?.releases[activeOS] ?? []
   const displayVersions = showAll ? platformReleases : platformReleases.slice(0, 7)
+  const mobileDownloadUrl = siteUrl(localizedPath(language, '/download')).replace(/^https?:\/\//, '')
 
   if (mobile) {
     return (
@@ -414,7 +416,7 @@ export default function DownloadPage() {
               className="mx-1 px-2 py-0.5 rounded font-mono text-[oklch(0.74_0.10_212)]"
               style={{ background: 'oklch(0.74 0.10 212 / 0.08)' }}
             >
-              xingniang.app/{language}/download
+              {mobileDownloadUrl}
             </span>
           </p>
         </motion.div>
