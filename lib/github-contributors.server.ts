@@ -50,6 +50,7 @@ async function fetchGitHubPage(url: string, proxyEnabled: boolean): Promise<Resp
   const response = await fetch(requestUrl, {
     headers: githubHeaders(!proxyEnabled),
     cache: 'no-store',
+    signal: AbortSignal.timeout(12_000),
   })
 
   if (proxyEnabled && (response.status === 403 || response.status === 429)) {
@@ -60,6 +61,7 @@ async function fetchGitHubPage(url: string, proxyEnabled: boolean): Promise<Resp
     return fetch(requestUrl, {
       headers: githubHeaders(false),
       cache: 'no-store',
+      signal: AbortSignal.timeout(12_000),
     })
   }
 

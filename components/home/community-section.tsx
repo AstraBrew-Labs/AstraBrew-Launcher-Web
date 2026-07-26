@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Chat, GithubLogo, ArrowSquareOut } from '@phosphor-icons/react'
 import { useSitePreferences } from '@/components/site-preferences'
 
@@ -41,7 +40,7 @@ export default function CommunitySection() {
   const { t } = useSitePreferences()
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="defer-render relative py-24 overflow-hidden">
 
       {/* 背景装饰 */}
       <div
@@ -53,13 +52,7 @@ export default function CommunitySection() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
 
           {/* 左侧标题 */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6 }}
-            className="lg:w-72 flex-shrink-0 text-center lg:text-left"
-          >
+          <div className="lg:w-72 flex-shrink-0 text-center lg:text-left">
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-medium"
               style={{
@@ -81,24 +74,19 @@ export default function CommunitySection() {
                 'Share setup advice, get help, and take part in improving the open-source launcher.',
               )}
             </p>
-          </motion.div>
+          </div>
 
           {/* 右侧卡片网格 */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {communities.map((community, i) => {
+            {communities.map((community) => {
               const Icon = community.icon
               return (
-                <motion.a
+                <a
                   key={community.platform}
                   href={community.href}
                   target="_blank"
                   rel="noreferrer"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-80px' }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="group glass-card rounded-2xl p-5 block hover:border-[oklch(0.74_0.10_212/0.5)] transition-all duration-200"
+                  className="group glass-card rounded-2xl p-5 block hover:-translate-y-0.5 hover:border-[oklch(0.74_0.10_212/0.5)] transition-all duration-200"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div
@@ -127,7 +115,7 @@ export default function CommunitySection() {
                     {t(community.action, community.actionEn)}
                     <ArrowSquareOut weight="bold" className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-150" />
                   </div>
-                </motion.a>
+                </a>
               )
             })}
           </div>

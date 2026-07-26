@@ -10,7 +10,7 @@
 
 @theme inline {
   /* --- 字体 --- */
-  --font-sans: var(--font-noto), var(--font-inter), 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* --- 基础颜色 --- */
@@ -163,13 +163,13 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
   }
 
   html[data-language='en'] body {
-    font-family: var(--font-inter), var(--font-noto), 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -210,6 +210,73 @@
    通用工具类
    ============================================================ */
 @layer utilities {
+
+  .page-enter {
+    animation: page-enter 180ms ease-out both;
+  }
+
+  .nav-enter {
+    animation: nav-enter 350ms ease-out both;
+  }
+
+  .menu-enter {
+    animation: menu-enter 200ms ease-out both;
+  }
+
+  .defer-render {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  .hero-particle {
+    animation: hero-particle 4.5s ease-in-out infinite;
+  }
+
+  .hero-note {
+    animation: hero-note 4.5s ease-in-out infinite;
+  }
+
+  .spin-continuous {
+    animation: spin-continuous 10s linear infinite;
+  }
+
+  .scroll-indicator {
+    animation: scroll-indicator 2s ease-in-out infinite;
+  }
+
+  @keyframes page-enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes nav-enter {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes menu-enter {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes hero-particle {
+    0%, 100% { opacity: 0.25; transform: translateY(0); }
+    50% { opacity: 0.7; transform: translateY(-28px); }
+  }
+
+  @keyframes hero-note {
+    0%, 100% { opacity: 0; transform: translateY(-8px); }
+    50% { opacity: 0.55; transform: translateY(-36px); }
+  }
+
+  @keyframes spin-continuous {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes scroll-indicator {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 8px); }
+  }
 
   /* 品牌渐变文字 */
   .text-gradient {
@@ -354,5 +421,16 @@
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

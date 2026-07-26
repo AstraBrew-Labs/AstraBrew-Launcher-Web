@@ -78,6 +78,7 @@ async function requestReleaseData(mode: ReleaseMode): Promise<ReleasesPayload> {
     pendingRequests[mode] = fetch(mode === 'proxy' ? '/api/releases?proxy=1' : '/api/releases', {
       headers: { Accept: 'application/json' },
       cache: 'no-store',
+      signal: AbortSignal.timeout(30_000),
     })
       .then(async (response) => {
         const payload: unknown = await response.json()
@@ -93,6 +94,9 @@ async function requestReleaseData(mode: ReleaseMode): Promise<ReleasesPayload> {
         return payload
       })
       .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'TimeoutError') {
+          throw new Error('请求超时，请检查网络后重试。')
+        }
         if (error instanceof TypeError) throw new Error('网络错误，无法获取发布信息。')
         if (error instanceof Error) throw error
         throw new Error('网络错误，无法获取发布信息。')

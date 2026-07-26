@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Lightning, ShieldCheck, Stack, Cpu, Package, Translate } from '@phosphor-icons/react'
 import { Card } from '@heroui/react'
 import { useSitePreferences } from '@/components/site-preferences'
@@ -62,33 +61,17 @@ const features = [
   },
 ]
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-}
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-}
-
 export default function FeaturesSection() {
   const { t } = useSitePreferences()
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="defer-render relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-section-gradient opacity-60" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* 标题区 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-medium"
             style={{
@@ -110,24 +93,14 @@ export default function FeaturesSection() {
               'From environment setup to instance launch, AstraBrew brings the complex steps into one clear desktop interface.',
             )}
           </p>
-        </motion.div>
+        </div>
 
         {/* 功能卡片网格 */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <motion.div
-                key={feature.title}
-                variants={cardVariants}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              >
+              <div key={feature.title} className="transition-transform duration-200 hover:-translate-y-1">
                 <Card variant="transparent" className="group relative h-full glass-card rounded-2xl p-0 cursor-default">
                   {/* 悬浮时背景光效 */}
                   <div
@@ -151,10 +124,10 @@ export default function FeaturesSection() {
                     <Card.Description className="text-sm text-muted-foreground leading-relaxed">{t(feature.description, feature.descriptionEn)}</Card.Description>
                   </Card.Content>
                 </Card>
-              </motion.div>
+              </div>
             )
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   )

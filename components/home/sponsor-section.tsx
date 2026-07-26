@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Heart, Coffee } from 'lucide-react'
-import { Heart as HeartP, CoffeeBean, Star } from '@phosphor-icons/react'
+import { Heart as HeartP, CoffeeBean } from '@phosphor-icons/react'
 import { useSitePreferences } from '@/components/site-preferences'
 
 const sponsors = {
@@ -26,7 +24,7 @@ export default function SponsorSection() {
   const { t } = useSitePreferences()
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="defer-render relative py-24 overflow-hidden">
 
       {/* 顶部分隔线 */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px"
@@ -36,13 +34,7 @@ export default function SponsorSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* 标题 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14"
-        >
+        <div className="text-center mb-14">
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-medium"
             style={{
@@ -63,16 +55,10 @@ export default function SponsorSection() {
               'Thanks to SillyTavern and every open-source project that makes AstraBrew Launcher possible.',
             )}
           </p>
-        </motion.div>
+        </div>
 
         {/* 铂金赞助商 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <div className="text-center mb-4">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('核心项目', 'Core Projects')}</span>
           </div>
@@ -96,16 +82,10 @@ export default function SponsorSection() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* 黄金赞助商 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <div className="text-center mb-4">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('重要依赖', 'Key Dependencies')}</span>
           </div>
@@ -126,16 +106,10 @@ export default function SponsorSection() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* 个人赞助者 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-10"
-        >
+        <div className="mb-10">
           <div className="text-center mb-4">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('工具与生态', 'Tools and Ecosystem')}</span>
           </div>
@@ -162,16 +136,10 @@ export default function SponsorSection() {
               {t('以及更多...', 'And more...')}
             </span>
           </div>
-        </motion.div>
+        </div>
 
         {/* 赞助 CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center"
-        >
+        <div className="text-center">
           <div
             className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl glass-card"
             style={{ border: '1px solid oklch(0.74 0.10 212 / 0.25)' }}
@@ -188,7 +156,7 @@ export default function SponsorSection() {
               {t('赞助星酿启动器', 'Sponsor AstraBrew')}
             </a>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

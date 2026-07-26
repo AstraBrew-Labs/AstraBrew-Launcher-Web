@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
-import { Noto_Sans_SC, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import {
@@ -11,20 +10,6 @@ import {
   type SiteLanguage,
 } from '@/lib/site-i18n'
 import '../../globals.css'
-
-const notoSansSC = Noto_Sans_SC({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700', '900'],
-  variable: '--font-noto',
-  display: 'swap',
-})
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-inter',
-  display: 'swap',
-})
 
 export const dynamicParams = false
 
@@ -108,13 +93,16 @@ export default async function LocalizedRootLayout({
   return (
     <html
       lang={language === 'zh' ? 'zh-CN' : 'en'}
-      className={`${notoSansSC.variable} ${inter.variable} dark bg-background`}
+      className="dark bg-background"
       data-theme="dark"
       data-language={language}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased bg-background text-foreground">
+      <body
+        className="font-sans antialiased bg-background text-foreground"
+        suppressHydrationWarning
+      >
         {children}
         <Analytics />
         <SpeedInsights />

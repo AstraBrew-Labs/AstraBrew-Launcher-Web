@@ -4,7 +4,6 @@ import { useState, useEffect, type Key } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Cloud, CloudOff, Menu, X, Download, Languages, Moon, Sun } from 'lucide-react'
 import { Button, Dropdown, Label, Tooltip, buttonVariants } from '@heroui/react'
 import { useSitePreferences, type SiteLanguage } from '@/components/site-preferences'
@@ -48,12 +47,8 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -16, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-        style={{ willChange: 'transform, opacity' }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      <header
+        className={`nav-enter fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
             ? 'glass-card border-b border-border/50'
             : 'bg-transparent'
@@ -70,6 +65,8 @@ export default function Navbar() {
                   alt={t('星酿启动器 Logo', 'AstraBrew Launcher logo')}
                   width={32}
                   height={32}
+                  sizes="32px"
+                  priority
                   className="rounded-lg shadow-lg group-hover:shadow-[0_0_16px_oklch(0.74_0.10_212/0.5)] transition-shadow duration-300"
                 />
               </div>
@@ -99,14 +96,13 @@ export default function Navbar() {
                     }`}
                   >
                     {isActive && (
-                      <motion.div
-                        layoutId="nav-active"
+                      <span
+                        aria-hidden="true"
                         className="absolute inset-0 rounded-lg"
                         style={{
                           background: 'oklch(0.74 0.10 212 / 0.12)',
                           border: '1px solid oklch(0.74 0.10 212 / 0.3)',
                         }}
-                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                       />
                     )}
                     <span className="relative z-10">{t(link.zh, link.en)}</span>
@@ -201,23 +197,21 @@ export default function Navbar() {
                 variant="ghost"
                 className="lg:hidden min-w-0 w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5"
                 aria-label={t('切换导航菜单', 'Toggle navigation menu')}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-navigation"
               >
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 z-40 glass-card border-b border-border/50 lg:hidden"
+      {mobileOpen && (
+          <div
+            id="mobile-navigation"
+            className="menu-enter fixed top-16 left-0 right-0 z-40 glass-card border-b border-border/50 lg:hidden"
           >
             <nav className="flex flex-col p-4 gap-1">
               {navLinks.map((link) => {
@@ -249,9 +243,8 @@ export default function Navbar() {
                 </Link>
               </div>
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+      )}
     </>
   )
 }

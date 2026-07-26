@@ -3,15 +3,15 @@ import { Info, Warning } from '@phosphor-icons/react'
 export function HelpContent({ html }: { html: string }) {
   return (
     <div
-      className="prose-custom text-sm leading-relaxed text-muted-foreground"
+      className="prose-custom min-w-0 break-words text-sm leading-relaxed text-muted-foreground"
       dangerouslySetInnerHTML={{
         __html: html
           .replace(/<ul>/g, '<ul class="list-none space-y-1.5 mt-2">')
           .replace(/<ol>/g, '<ol class="list-none space-y-1.5 mt-2">')
-          .replace(/<li>/g, '<li class="flex items-start gap-2"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[oklch(0.74_0.10_212/0.7)] flex-shrink-0"></span><span>')
+          .replace(/<li>/g, '<li class="flex min-w-0 items-start gap-2"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[oklch(0.74_0.10_212/0.7)] flex-shrink-0"></span><span class="min-w-0 flex-1 break-words">')
           .replace(/<\/li>/g, '</span></li>')
           .replace(/<strong>/g, '<strong class="text-foreground font-semibold">')
-          .replace(/<code>/g, '<code class="px-1.5 py-0.5 rounded text-xs font-mono" style="background:var(--surface);color:var(--primary)">'),
+          .replace(/<code>/g, '<code class="inline-block max-w-full break-all rounded px-1.5 py-0.5 align-middle text-xs font-mono" style="background:var(--surface);color:var(--primary)">'),
       }}
     />
   )
@@ -28,7 +28,7 @@ export function HelpTip({ type, text }: { type: 'info' | 'warning'; text: string
       {type === 'warning'
         ? <Warning weight="fill" className="mt-0.5 size-4 shrink-0" />
         : <Info weight="fill" className="mt-0.5 size-4 shrink-0" />}
-      <span>{text}</span>
+      <span className="min-w-0 break-words">{text}</span>
     </div>
   )
 }

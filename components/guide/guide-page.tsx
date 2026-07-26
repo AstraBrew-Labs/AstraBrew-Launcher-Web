@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, X } from 'lucide-react'
 import {
   DownloadSimple, Warning, CheckCircle, Info, ArrowRight, List
@@ -150,7 +149,7 @@ function StepImage({ alt, desc }: { alt: string; desc: string }) {
 
   return (
     <div
-      className="rounded-xl overflow-hidden mt-4 mb-2"
+      className="mt-4 mb-2 w-full max-w-full overflow-hidden rounded-xl"
       style={{ border: '1px solid oklch(0.30 0.04 218 / 0.5)' }}
     >
       <div
@@ -187,35 +186,35 @@ export default function GuidePage() {
   const nextChapter = chapterIndex < localizedChapters.length - 1 ? localizedChapters[chapterIndex + 1] : null
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen max-w-full overflow-x-clip pt-16">
 
       {/* Hero */}
-      <section className="relative py-16 overflow-hidden border-b border-border/40">
+      <section className="relative overflow-hidden border-b border-border/40 py-10 sm:py-16">
         <div className="absolute inset-0 bg-section-gradient opacity-60" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div>
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-medium"
               style={{ background: 'oklch(0.70 0.12 188 / 0.1)', border: '1px solid oklch(0.70 0.12 188 / 0.3)', color: 'var(--brand-green-text)' }}
             >
               {t('使用指南', 'User Guide')}
             </div>
-            <h1 className="text-4xl font-black mb-3 text-balance">
+            <h1 className="mb-3 text-3xl font-black text-balance sm:text-4xl">
               <span className="text-gradient">{t('星酿启动器', 'AstraBrew Launcher')}</span> {t('使用说明', 'Guide')}
             </h1>
-            <p className="text-muted-foreground max-w-lg mx-auto">
+            <p className="mx-auto max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
               {t('查看 Windows 与 macOS 安装方法，以及安装和启动时的常见问题。', 'Install AstraBrew on Windows or macOS and find answers to common setup questions.')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* 主体布局 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex gap-8">
+      <div className="mx-auto w-full max-w-7xl px-3 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="flex min-w-0 flex-col gap-6 lg:flex-row lg:gap-8">
 
           {/* 侧边栏 · 桌面 */}
-          <aside className="hidden lg:block w-60 flex-shrink-0">
+          <aside className="hidden w-60 shrink-0 lg:block">
             <div className="sticky top-24">
               <nav className="space-y-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-3 mb-3">{t('章节目录', 'Contents')}</p>
@@ -244,25 +243,21 @@ export default function GuidePage() {
           </aside>
 
           {/* 移动侧边栏触发 */}
-          <div className="lg:hidden mb-4 w-full">
+          <div className="w-full min-w-0 lg:hidden">
             <Button
               fullWidth
               onPress={() => setSidebarOpen(!sidebarOpen)}
               variant="outline"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium glass-card w-full"
+              className="glass-card flex w-full min-w-0 items-center justify-start gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
+              aria-expanded={sidebarOpen}
+              aria-controls="guide-mobile-chapters"
             >
-              {sidebarOpen ? <X className="w-4 h-4" /> : <List weight="bold" className="w-4 h-4" />}
-              <span>{chapter.title}</span>
-              <ChevronRight className={`w-4 h-4 ml-auto transition-transform ${sidebarOpen ? 'rotate-90' : ''}`} />
+              {sidebarOpen ? <X className="size-4 shrink-0" /> : <List weight="bold" className="size-4 shrink-0" />}
+              <span className="min-w-0 flex-1 truncate text-left">{chapter.title}</span>
+              <ChevronRight className={`ml-auto size-4 shrink-0 transition-transform ${sidebarOpen ? 'rotate-90' : ''}`} />
             </Button>
-            <AnimatePresence>
-              {sidebarOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
+            {sidebarOpen && (
+                <div id="guide-mobile-chapters" className="menu-enter overflow-hidden">
                   <nav className="mt-2 glass-card rounded-xl p-2 space-y-1">
                     {localizedChapters.map((c) => {
                       const Icon = c.icon
@@ -272,41 +267,33 @@ export default function GuidePage() {
                           fullWidth
                           onPress={() => { setActiveChapter(c.id); setSidebarOpen(false) }}
                           variant="ghost"
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
+                          className={`flex w-full min-w-0 items-center justify-start gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                             c.id === activeChapter ? 'text-foreground bg-[oklch(0.74_0.10_212/0.1)]' : 'text-muted-foreground'
                           }`}
                         >
-                          <Icon weight="fill" className="w-3.5 h-3.5" />
-                          {c.title}
+                          <Icon weight="fill" className="size-3.5 shrink-0" />
+                          <span className="min-w-0 flex-1 truncate">{c.title}</span>
                         </Button>
                       )
                     })}
                   </nav>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+            )}
           </div>
 
           {/* 内容区 */}
-          <main className="flex-1 min-w-0">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeChapter}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
+          <main className="w-full min-w-0 flex-1">
+              <div key={activeChapter} className="page-enter">
                 {/* 章节头 */}
-                <div className="flex items-center gap-3 mb-8">
+                <div className="mb-7 flex min-w-0 items-center gap-3 sm:mb-8">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl"
                     style={{ background: 'oklch(0.74 0.10 212 / 0.12)', border: '1px solid oklch(0.74 0.10 212 / 0.3)' }}
                   >
                     {(() => { const Icon = chapter.icon; return <Icon weight="fill" className="w-5 h-5 text-[oklch(0.74_0.10_212)]" /> })()}
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-foreground">{chapter.title}</h2>
+                  <div className="min-w-0">
+                    <h2 className="break-words text-xl font-black text-foreground sm:text-2xl">{chapter.title}</h2>
                     <p className="text-xs text-muted-foreground">
                       {chapter.steps.length} {chapter.id === 'troubleshoot' ? t('个问题', 'questions') : t('个步骤', 'steps')}
                     </p>
@@ -316,12 +303,9 @@ export default function GuidePage() {
                 {/* 步骤列表 */}
                 <div className="space-y-8">
                   {chapter.steps.map((step, i) => (
-                    <motion.div
+                    <div
                       key={step.title}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                      className="relative pl-10"
+                      className="relative min-w-0 pl-9 sm:pl-10"
                     >
                       {/* 步骤序号线 */}
                       <div className="absolute left-0 top-0 flex flex-col items-center">
@@ -336,46 +320,45 @@ export default function GuidePage() {
                         )}
                       </div>
 
-                      <div className="pb-4">
-                        <h3 className="font-bold text-base text-foreground mb-3">{step.title}</h3>
+                      <div className="min-w-0 pb-4">
+                        <h3 className="mb-3 break-words text-base font-bold text-foreground">{step.title}</h3>
                         <HelpContent html={step.content} />
                         {step.image && <StepImage alt={step.imageAlt} desc={step.imageDesc} />}
                         {'tip' in step && step.tip && <HelpTip type={step.tip.type} text={step.tip.text} />}
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
 
                 {/* 章节导航 */}
-                <div className="flex items-center justify-between mt-12 pt-6 border-t border-border/40">
+                <div className="mt-10 flex flex-col gap-3 border-t border-border/40 pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
                   {prevChapter ? (
                     <Button
                       onPress={() => setActiveChapter(prevChapter.id)}
                       variant="ghost"
-                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+                      className="group flex w-full min-w-0 items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:w-auto"
                     >
                       <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
                       <span>{prevChapter.title}</span>
                     </Button>
-                  ) : <div />}
+                  ) : <div className="hidden sm:block" />}
                   {nextChapter ? (
                     <Button
                       onPress={() => setActiveChapter(nextChapter.id)}
                       variant="ghost"
-                      className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-[var(--brand-blue-text)] transition-colors group"
+                      className="group flex w-full min-w-0 items-center justify-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-[var(--brand-blue-text)] sm:w-auto"
                     >
                       <span>{nextChapter.title}</span>
                       <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   ) : (
-                    <div className="flex items-center gap-2 text-sm text-[oklch(0.70_0.12_188)]">
+                    <div className="flex w-full items-center justify-center gap-2 text-sm text-[oklch(0.70_0.12_188)] sm:w-auto sm:justify-start">
                       <CheckCircle weight="fill" className="w-4 h-4" />
                       {t('已浏览全部内容', 'End of guide')}
                     </div>
                   )}
                 </div>
-              </motion.div>
-            </AnimatePresence>
+              </div>
           </main>
         </div>
       </div>

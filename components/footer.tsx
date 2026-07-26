@@ -55,12 +55,13 @@ export default function Footer() {
 
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href={localizedPath(language, '/')} className="flex items-center gap-2.5 group mb-4">
+            <Link prefetch={false} href={localizedPath(language, '/')} className="flex items-center gap-2.5 group mb-4">
               <Image
                 src="/images/logo.png"
                 alt={t('星酿启动器 Logo', 'AstraBrew Launcher logo')}
                 width={32}
                 height={32}
+                sizes="32px"
                 className="rounded-lg shadow-lg"
               />
               <span className="flex flex-col leading-tight">
@@ -97,6 +98,7 @@ export default function Footer() {
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
+                      prefetch={false}
                       href={link.href.startsWith('/') ? localizedPath(language, link.href) : link.href}
                       target={link.href.startsWith('http') ? '_blank' : undefined}
                       rel={link.href.startsWith('http') ? 'noreferrer' : undefined}

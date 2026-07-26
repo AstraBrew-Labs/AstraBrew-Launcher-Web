@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { ExternalLink, RefreshCw, UsersRound } from 'lucide-react'
 import { Alert, Avatar, Button, Chip, Modal, Skeleton } from '@heroui/react'
 import {
@@ -58,35 +57,23 @@ const sponsors = {
   ],
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55 } },
-}
-
 type Translate = (zh: string, en: string) => string
 
 function ContributorCard({
   contributor,
-  index,
   language,
   t,
 }: {
   contributor: ContributorInfo
-  index: number
   language: 'zh' | 'en'
   t: Translate
 }) {
   return (
-    <motion.a
+    <a
       href={contributor.profileUrl}
       target="_blank"
       rel="noreferrer"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: Math.min(index, 8) * 0.06 }}
-      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-      className="group glass-card flex min-h-40 flex-col rounded-2xl p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="group glass-card flex min-h-40 flex-col rounded-2xl p-6 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       aria-label={t(`访问 ${contributor.login} 的 GitHub 主页`, `Visit ${contributor.login} on GitHub`)}
     >
       <div className="flex items-center gap-4">
@@ -122,7 +109,7 @@ function ContributorCard({
           </Chip>
         ))}
       </div>
-    </motion.a>
+    </a>
   )
 }
 
@@ -167,7 +154,7 @@ export default function AboutPage() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <div>
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 text-xs font-medium"
               style={{ background: 'oklch(0.74 0.10 212 / 0.1)', border: '1px solid oklch(0.74 0.10 212 / 0.3)', color: 'var(--brand-blue-text)' }}
@@ -188,14 +175,14 @@ export default function AboutPage() {
                 'Originally known as SillyTavern Launcher GUI, AstraBrew is a beginner-friendly launcher and manager built with Rust and egui. It brings environment setup, instance management, updates, and one-click launch into a clear desktop interface.',
               )}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
 
         {/* ── 产品理念 ── */}
-        <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}>
+        <section className="defer-render">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
@@ -242,10 +229,10 @@ export default function AboutPage() {
               )
             })}
           </div>
-        </motion.section>
+        </section>
 
         {/* ── 发展历程 ── */}
-        <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}>
+        <section className="defer-render">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-black mb-2 text-balance">{t('发展', 'Our ')}<span className="text-gradient">{t('历程', 'Journey')}</span></h2>
             <p className="text-muted-foreground text-sm">{t('从酒馆启动器 GUI 到跨平台原生应用', 'From SillyTavern Launcher GUI to native cross-platform editions')}</p>
@@ -258,12 +245,8 @@ export default function AboutPage() {
             />
             <div className="space-y-8">
               {milestones.map((m, i) => (
-                <motion.div
+                <div
                   key={m.year}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
                   className={`flex gap-6 md:gap-0 items-start md:items-center ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                 >
                   {/* 内容 */}
@@ -295,14 +278,14 @@ export default function AboutPage() {
 
                   {/* 占位 */}
                   <div className="flex-1 hidden md:block" />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── 项目贡献者 ── */}
-        <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}>
+        <section className="defer-render">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-black mb-2 text-balance">{t('项目', 'Project ')}<span className="text-gradient">{t('贡献者', 'Contributors')}</span></h2>
             <p className="text-muted-foreground text-sm">{t('感谢每一位为 Windows 和 macOS 版本作出贡献的开发者', 'Thanks to everyone contributing to the Windows and macOS editions')}</p>
@@ -357,11 +340,10 @@ export default function AboutPage() {
               className={contributorGridClass(visibleContributorItems)}
               aria-busy={contributorsRefreshing}
             >
-              {visibleContributors.map((contributor, index) => (
+              {visibleContributors.map((contributor) => (
                 <ContributorCard
                   key={contributor.id}
                   contributor={contributor}
-                  index={index}
                   language={language}
                   t={t}
                 />
@@ -396,7 +378,7 @@ export default function AboutPage() {
               </Button>
             </Alert>
           )}
-        </motion.section>
+        </section>
 
         <Modal.Backdrop
           isOpen={contributorsModalOpen}
@@ -417,11 +399,10 @@ export default function AboutPage() {
               </Modal.Header>
               <Modal.Body className="max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                  {contributors.map((contributor, index) => (
+                  {contributors.map((contributor) => (
                     <ContributorCard
                       key={contributor.id}
                       contributor={contributor}
-                      index={index}
                       language={language}
                       t={t}
                     />
@@ -438,7 +419,7 @@ export default function AboutPage() {
         </Modal.Backdrop>
 
         {/* ── 社群 ── */}
-        <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}>
+        <section className="defer-render">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-black mb-2 text-balance">{t('加入', 'Join the ')}<span className="text-gradient">{t('社群', 'Community')}</span></h2>
           </div>
@@ -471,10 +452,10 @@ export default function AboutPage() {
               )
             })}
           </div>
-        </motion.section>
+        </section>
 
         {/* ── 赞助商 ── */}
-        <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }}>
+        <section className="defer-render">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-black mb-2 text-balance"><span className="text-gradient">{t('开源项目', 'Open Source')}</span>{t('致谢', ' Acknowledgements')}</h2>
             <p className="text-muted-foreground text-sm">{t('感谢 SillyTavern 与构成启动器技术基础的开源生态', 'Thanks to SillyTavern and the open-source ecosystem behind AstraBrew')}</p>
@@ -539,7 +520,7 @@ export default function AboutPage() {
               </a>
             </div>
           </div>
-        </motion.section>
+        </section>
 
       </div>
     </div>

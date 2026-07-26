@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Download, ArrowRight, ChevronDown } from 'lucide-react'
 import { Star, MusicNote, Sparkle } from '@phosphor-icons/react'
 import { Button, Card, buttonVariants } from '@heroui/react'
@@ -28,11 +27,9 @@ function FloatingParticle({
   x, y, size, delay, duration, color
 }: { x: number; y: number; size: number; delay: number; duration: number; color: string }) {
   return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: color, willChange: 'transform, opacity' }}
-      animate={{ y: [0, -28, 0], opacity: [0.25, 0.7, 0.25] }}
-      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+    <div
+      className="hero-particle absolute rounded-full pointer-events-none"
+      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: color, animationDuration: `${duration}s`, animationDelay: `${delay}s` }}
     />
   )
 }
@@ -40,14 +37,12 @@ function FloatingParticle({
 // 装饰音符
 function FloatingNote({ x, y, delay }: { x: number; y: number; delay: number }) {
   return (
-    <motion.div
-      className="absolute pointer-events-none text-[oklch(0.74_0.10_212/0.25)]"
-      style={{ left: `${x}%`, top: `${y}%`, willChange: 'transform, opacity' }}
-      animate={{ y: [-8, -36, -8], opacity: [0, 0.55, 0] }}
-      transition={{ duration: 4.5, delay, repeat: Infinity, ease: 'easeInOut' }}
+    <div
+      className="hero-note absolute pointer-events-none text-[oklch(0.74_0.10_212/0.25)]"
+      style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${delay}s` }}
     >
       <MusicNote weight="fill" className="w-5 h-5" />
-    </motion.div>
+    </div>
   )
 }
 
@@ -66,14 +61,12 @@ function LauncherOrb() {
       />
 
       {/* 中心核心 — GPU rotate，无 JS 函数 */}
-      <motion.div
-        className="absolute inset-10 rounded-full bg-brand-gradient shadow-2xl"
+      <div
+        className="spin-continuous absolute inset-10 rounded-full bg-brand-gradient shadow-2xl"
         style={{
           boxShadow: '0 0 60px oklch(0.73 0.11 210 / 0.5), 0 0 120px oklch(0.70 0.12 188 / 0.3)',
-          willChange: 'transform',
+          animationDuration: '20s',
         }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
       />
 
       {/* 星形图标 */}
@@ -87,12 +80,10 @@ function LauncherOrb() {
         { angle: 120, radius: 85,  duration: 8,  color: 'oklch(0.70 0.12 188)' },
         { angle: 240, radius: 100, duration: 10, color: 'oklch(0.74 0.10 212)' },
       ] as const).map((orbit, i) => (
-        <motion.div
+        <div
           key={i}
-          className="absolute inset-0"
-          style={{ rotate: orbit.angle, willChange: 'transform' }}
-          animate={{ rotate: orbit.angle + 360 }}
-          transition={{ duration: orbit.duration, repeat: Infinity, ease: 'linear' }}
+          className="spin-continuous absolute inset-0"
+          style={{ animationDuration: `${orbit.duration}s`, animationDelay: `${-(orbit.angle / 60)}s` }}
         >
           <div
             className="absolute w-2.5 h-2.5 rounded-full top-1/2 -mt-[5px]"
@@ -102,7 +93,7 @@ function LauncherOrb() {
               boxShadow: `0 0 6px ${orbit.color}`,
             }}
           />
-        </motion.div>
+        </div>
       ))}
     </div>
   )
@@ -166,10 +157,7 @@ export default function HeroSection() {
           <div className="flex-1 text-center lg:text-left max-w-2xl">
 
             {/* 徽章 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
+            <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6"
               style={{
                 background: 'oklch(0.74 0.10 212 / 0.1)',
@@ -181,25 +169,19 @@ export default function HeroSection() {
                 {t(`${latestVersionLabel} 现已发布`, `${latestVersionLabel} is available`)}
               </span>
               <ArrowRight className="w-3 h-3 text-[oklch(0.74_0.10_212)]" />
-            </motion.div>
+            </div>
 
             {/* 主标题 */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
+            <h1
               className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-4 text-balance"
             >
               <span className="text-gradient">{t('星酿', 'AstraBrew')}</span>
               <br />
               <span className="text-foreground">{t('启动器', 'Launcher')}</span>
-            </motion.h1>
+            </h1>
 
             {/* 副标题 */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.6 }}
+            <p
               className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 text-pretty max-w-lg mx-auto lg:mx-0"
             >
               {t('专为新手打造的 SillyTavern 一站式启动与管理工具。', 'A beginner-friendly launcher and manager for SillyTavern.')}
@@ -208,13 +190,10 @@ export default function HeroSection() {
                 '简化环境配置、实例管理与版本更新，让酒馆开箱即用。',
                 'Set up environments, manage instances, and update versions without the usual complexity.',
               )}
-            </motion.p>
+            </p>
 
             {/* CTA 按钮组 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
+            <div
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
             >
               {os === 'unknown' ? (
@@ -279,13 +258,10 @@ export default function HeroSection() {
                 {t('查看使用说明', 'Read the guide')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
-            </motion.div>
+            </div>
 
             {/* 版本信息 */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
+            <p
               className="mt-5 text-xs text-muted-foreground"
             >
               {latestRelease?.version ?? t('持续更新', 'Continuously updated')} · {t('支持', 'Supports')} Windows 10+ / macOS 12+
@@ -295,27 +271,17 @@ export default function HeroSection() {
                   {t('已检测到', 'Detected')} {os === 'mac' ? 'macOS' : 'Windows'}
                 </span>
               )}
-            </motion.p>
+            </p>
           </div>
 
           {/* 右侧装饰 */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-            className="flex-shrink-0 float-animation"
-          >
+          <div className="flex-shrink-0 float-animation">
             <LauncherOrb />
-          </motion.div>
+          </div>
         </div>
 
         {/* 统计数据条 */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4"
-        >
+        <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { value: 'Rust', label: t('高性能核心', 'Performance core') },
             { value: 'egui', label: t('原生响应界面', 'Native responsive UI') },
@@ -333,18 +299,14 @@ export default function HeroSection() {
               </Card.Content>
             </Card>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* 滚动指示器 */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      >
+      <div className="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
         <span className="text-xs text-muted-foreground">{t('向下滚动', 'Scroll down')}</span>
         <ChevronDown className="w-4 h-4 text-muted-foreground" />
-      </motion.div>
+      </div>
     </section>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import { ChevronDown, ChevronUp, CircleHelp, RefreshCw } from 'lucide-react'
 import { Accordion, Alert, Button, Skeleton, Tabs } from '@heroui/react'
 import {
@@ -134,11 +133,8 @@ function LatestReleaseSection({
   const assets = getDownloadAssets(release, platform)
 
   return (
-    <motion.section
+    <section
       key={`${type}-${platform}`}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className="space-y-5"
     >
       <h2 className="text-lg font-bold text-foreground">{t(`最新${typeLabel}`, `Latest ${typeLabel}`)}</h2>
@@ -261,7 +257,7 @@ function LatestReleaseSection({
           <Button onPress={onReload} size="sm" variant="outline">{t('重新加载', 'Reload')}</Button>
         </Alert>
       )}
-    </motion.section>
+    </section>
   )
 }
 
@@ -271,11 +267,8 @@ function InstallationFaqSection({ platform }: { platform: ReleasePlatform }) {
   const platformLabel = platform === 'windows' ? 'Windows' : 'macOS'
 
   return (
-    <motion.section
+    <section
       key={`installation-faq-${platform}`}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className="mt-14"
     >
       <div className="mb-5 flex items-start gap-3">
@@ -315,7 +308,7 @@ function InstallationFaqSection({ platform }: { platform: ReleasePlatform }) {
           </Accordion.Item>
         ))}
       </Accordion>
-    </motion.section>
+    </section>
   )
 }
 
@@ -324,7 +317,7 @@ export default function DownloadPage() {
   const [activeOS, setActiveOS] = useState<ReleasePlatform>('windows')
   const [activeTab, setActiveTab] = useState<TabType>('latest')
   const [showAll, setShowAll] = useState(false)
-  const [mobile, setMobile] = useState(false)
+  const [mobile, setMobile] = useState<boolean | null>(null)
   const {
     data,
     error,
@@ -332,7 +325,7 @@ export default function DownloadPage() {
     isRefreshing,
     isUsingFallback,
     reload,
-  } = useReleases({ enabled: ready, proxyEnabled: githubProxyEnabled })
+  } = useReleases({ enabled: ready && mobile === false, proxyEnabled: githubProxyEnabled })
 
   useEffect(() => {
     setMobile(isMobile())
@@ -351,18 +344,13 @@ export default function DownloadPage() {
 
   if (mobile) {
     return (
-      <div className="min-h-screen pt-16 flex items-center justify-center px-6">
+      <div className="relative flex min-h-[100svh] w-full max-w-full items-center justify-center overflow-x-clip px-4 pt-16 sm:px-6">
         <div className="absolute inset-0 bg-section-gradient" />
         <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full opacity-15 blur-3xl pointer-events-none"
+          className="pointer-events-none absolute left-1/2 top-1/4 h-[300px] w-[calc(100vw-2rem)] max-w-[500px] -translate-x-1/2 rounded-full opacity-15 blur-3xl"
           style={{ background: 'radial-gradient(ellipse, oklch(0.73 0.11 210 / 0.5), transparent 70%)' }}
         />
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative z-10 max-w-sm w-full text-center"
-        >
+        <div className="relative z-10 w-full min-w-0 max-w-sm text-center">
           <div className="flex items-center justify-center gap-4 mb-8">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center"
@@ -394,7 +382,7 @@ export default function DownloadPage() {
             )}
           </p>
 
-          <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
             {platforms.map(({ icon: Icon, label }) => (
               <div
                 key={label}
@@ -410,16 +398,16 @@ export default function DownloadPage() {
             ))}
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            {t('在电脑浏览器中访问', 'Visit on your desktop')}
+          <p className="flex min-w-0 flex-col items-center gap-2 text-xs text-muted-foreground">
+            <span>{t('在电脑浏览器中访问', 'Visit on your desktop')}</span>
             <span
-              className="mx-1 px-2 py-0.5 rounded font-mono text-[oklch(0.74_0.10_212)]"
+              className="inline-block max-w-full break-all rounded px-2 py-1 font-mono leading-relaxed text-[oklch(0.74_0.10_212)]"
               style={{ background: 'oklch(0.74 0.10 212 / 0.08)' }}
             >
               {mobileDownloadUrl}
             </span>
           </p>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -434,11 +422,7 @@ export default function DownloadPage() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div>
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5 text-xs font-medium"
               style={{
@@ -461,7 +445,7 @@ export default function DownloadPage() {
                 'Choose your operating system and download the latest installer.',
               )}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -506,12 +490,7 @@ export default function DownloadPage() {
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as TabType)}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-6 w-fit mx-auto"
-            >
+            <div className="mb-6 w-fit mx-auto">
               <Tabs.ListContainer>
                 <Tabs.List
                   aria-label={t('下载版本', 'Download versions')}
@@ -533,7 +512,7 @@ export default function DownloadPage() {
                   ))}
                 </Tabs.List>
               </Tabs.ListContainer>
-            </motion.div>
+            </div>
 
             <div className="flex items-center justify-between gap-4 mb-5">
               <div className="flex gap-2">
@@ -591,11 +570,8 @@ export default function DownloadPage() {
             </Tabs.Panel>
 
             <Tabs.Panel id="all" className="p-0">
-              <motion.div
+              <div
                 key={`all-${activeOS}`}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
               >
                 <div className="glass-card rounded-2xl overflow-hidden">
                   <div className="px-5 py-4 border-b border-border/50">
@@ -605,15 +581,12 @@ export default function DownloadPage() {
 
                   {displayVersions.length ? (
                     <div className="divide-y divide-border/40">
-                      {displayVersions.map((release, index) => {
+                      {displayVersions.map((release) => {
                         const assets = getDownloadAssets(release, activeOS)
 
                         return (
-                          <motion.div
+                          <div
                             key={release.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.04 }}
                             className="px-5 py-4 transition-colors hover:bg-white/3"
                           >
                             <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
@@ -679,7 +652,7 @@ export default function DownloadPage() {
                                 {t('该版本暂无安装附件，查看发布页面', 'No installer assets. View release page')}
                               </a>
                             )}
-                          </motion.div>
+                          </div>
                         )
                       })}
                     </div>
@@ -710,7 +683,7 @@ export default function DownloadPage() {
                     </Button>
                   )}
                 </div>
-              </motion.div>
+              </div>
             </Tabs.Panel>
           </Tabs>
         )}
