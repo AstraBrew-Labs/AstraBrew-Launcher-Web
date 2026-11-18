@@ -1,3 +1,4 @@
+import { RouteSeoContent } from "@/components/site/route-seo-content";
 import { Suspense } from "react";
 import Link from "next/link";
 import { Boxes, FolderCog, RefreshCw, ArrowUpRight, Download, Settings2, Play, Monitor, Apple, Code2 } from "lucide-react";
@@ -28,9 +29,9 @@ async function LocalizedHome({ params }: { params: Promise<{ lang: string }> }) 
   if (!isLocale(lang)) notFound();
   const structuredData = launcherStructuredData(lang);
   return <>
-    {structuredData && <script type="application/ld+json" dangerouslySetInnerHTML={{
+    {structuredData && <RouteSeoContent path={`/${lang}`}><script type="application/ld+json" dangerouslySetInnerHTML={{
       __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
-    }} />}
+    }} /></RouteSeoContent>}
     <HomeContent locale={lang} />
   </>;
 }

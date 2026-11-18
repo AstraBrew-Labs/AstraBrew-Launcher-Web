@@ -1,3 +1,4 @@
+import { RouteSeoContent } from '@/components/site/route-seo-content';
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { notFound } from 'next/navigation';
@@ -35,7 +36,7 @@ export default async function GuidePage({ params }: Props) {
   const { page } = await resolvePage(params);
   const Content = page.data.body;
   return <DocsPage toc={page.data.toc} data-transit-path={page.url}>
-    <DocsTitle id="main-content">{page.data.title}</DocsTitle>
+    <RouteSeoContent path={page.url}><DocsTitle id="main-content">{page.data.title}</DocsTitle></RouteSeoContent>
     <DocsDescription data-docs-description>{page.data.description}</DocsDescription>
     <DocsBody data-docs-body><Content components={defaultMdxComponents} /></DocsBody>
     <DocsMotionReady />

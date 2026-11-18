@@ -1,3 +1,4 @@
+import { RouteSeoContent } from "@/components/site/route-seo-content";
 import { PageMotion } from "@/components/site/page-motion";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -45,7 +46,7 @@ async function LicenseContent({ params }: Props) {
       <div className="license-shell">
         <header className="license-intro">
           <span className="license-kicker">AstraBrew Launcher / Windows</span>
-          <h1>{t("开源协议", "Open-source license")}</h1>
+          <RouteSeoContent path={`/${lang}/license`}><h1>{t("开源协议", "Open-source license")}</h1></RouteSeoContent>
         </header>
         <article className="license-document" aria-labelledby="license-name">
           <div className="license-filebar">

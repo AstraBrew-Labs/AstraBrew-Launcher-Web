@@ -1,5 +1,6 @@
 "use client";
 
+import { RouteSeoContent } from "@/components/site/route-seo-content";
 import { useState, useSyncExternalStore } from "react";
 import { Apple, ArrowDownToLine, Archive, Box, ChevronDown, ExternalLink, Monitor, PackageCheck } from "lucide-react";
 import { PageMotion } from "@/components/site/page-motion";
@@ -129,7 +130,7 @@ export function DownloadPage({ locale, region, initialPlatform }: { locale: Loca
     <PageMotion page="download" />
     <div className="dl_intro">
       <p className="dl_kicker">AstraBrew Launcher</p>
-      <h1>{zh ? "下载星酿启动器" : "Download AstraBrew Launcher"}</h1>
+      <RouteSeoContent path={`/${locale}/download`}><h1>{zh ? "下载星酿启动器" : "Download AstraBrew Launcher"}</h1></RouteSeoContent>
       <p>{zh ? "选择适合你的系统，开始管理 SillyTavern。" : "Choose your platform and get started with SillyTavern."}</p>
     </div>
     <div className="dl_sync">

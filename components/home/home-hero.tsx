@@ -1,5 +1,6 @@
 "use client";
 
+import { RouteSeoContent } from "@/components/site/route-seo-content";
 import Link from "next/link";
 import { ArrowDownToLine, Apple, Monitor, ArrowUpRight } from "lucide-react";
 import { useRef, useState, useSyncExternalStore } from "react";
@@ -40,7 +41,7 @@ export function HomeHero({ locale, windowsDownloads }: { locale: Locale; windows
   return <section className="home-hero">
     <div className="home-copy">
       <div className="home-name">AstraBrew Launcher</div>
-      <h1>{en ? <>SillyTavern,<br />ready to go.</> : <>一键启动酒馆<br />即刻沉浸。</>}</h1>
+      <RouteSeoContent path={`/${locale}`}><h1>{en ? <>SillyTavern,<br />ready to go.</> : <>一键启动酒馆<br />即刻沉浸。</>}</h1></RouteSeoContent>
       <p className="home-lead">{en ? "A beginner-friendly way to set up, launch and manage SillyTavern in one place." : "简化繁琐的 SillyTavern 环境配置，将环境管理、多实例掌控与版本更新集中于此，让你的酒馆时刻处于最佳状态。"}</p>
       {platform === "windows" ? windowsDownloads : <div className="home-actions">
         <Link href={`/${locale}/download${platform === "other" ? "" : `?platform=${platform}`}`} className="home-action-primary">
