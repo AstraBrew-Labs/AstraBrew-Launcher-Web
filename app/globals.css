@@ -1,7 +1,4 @@
-@import "tailwindcss";
-@import "@heroui/styles";
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
+@import "tailwindcss" source(none);
 @font-face{font-family:"ZCOOL KuaiLe";src:url('/fonts/ZCOOLKuaiLe-subset.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:Nunito;src:url('/fonts/Nunito-Latin-Variable.woff2') format('woff2');font-weight:400 800;font-style:normal;font-display:swap}
 :root{
@@ -42,7 +39,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .site-nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:var(--radius-pill);font-size:15px;font-weight:700;color:var(--astra-ink);transition:background-color 120ms var(--ease-out)}
 .site-nav a:hover{background:var(--astra-blue-soft)}
 .site-actions{display:flex;align-items:center;gap:8px}
-.site-header .site-language{min-width:0;min-height:44px;padding:0 14px;border-radius:var(--radius-pill);background:transparent;color:var(--astra-ink);font-family:var(--font-numeric);font-weight:800;font-size:14px}
+.site-header .site-language{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:44px;padding:0 14px;border-radius:var(--radius-pill);background:transparent;color:var(--astra-ink);font-family:var(--font-numeric);font-weight:800;font-size:14px}
 .site-header .site-language:hover{background:var(--astra-blue-soft);color:var(--astra-ink)}
 .site-header-cta{display:inline-flex;align-items:center;min-height:44px;padding:0 22px;border:2px solid var(--astra-ink);border-radius:var(--radius-pill);background:var(--astra-white);font-family:var(--font-numeric);font-size:14px;font-weight:800;white-space:nowrap;transition:background-color 120ms var(--ease-out)}
 .site-header-cta:hover{background:var(--astra-blue-soft)}
@@ -68,8 +65,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 @media(max-width:860px){.site-header-inner{gap:12px;flex-wrap:wrap;padding-top:14px;padding-bottom:10px}.site-logo img{width:136px}.site-actions{margin-left:auto}.site-nav{order:3;width:100%;margin:0 -8px;gap:0;overflow-x:auto}.site-nav a{white-space:nowrap;font-size:14px}.site-header-cta{display:none}.site-footer-inner{padding-top:40px;padding-bottom:40px}.site-footer-links{width:100%;margin-left:-12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.site-loading:after{animation:none}.skip-link,.site-nav a,.site-header-cta{transition:none}}
 
-/* The progress line is decorative and never replaces the native scrollbar. */
-.page-scroll-progress{position:fixed;inset:0 0 auto;z-index:20;height:2px;pointer-events:none}
+/* Native scroll motion doesn't require hydration or change text contrast. */
+.page-scroll-progress{display:none;position:fixed;inset:0 0 auto;z-index:20;height:2px;pointer-events:none}
 .page-scroll-progress span{display:block;width:100%;height:100%;transform:scaleX(0);transform-origin:left center;background:linear-gradient(90deg,#429fdc,#3db18e)}
-.scroll-motion-item:focus-within{opacity:1!important;transform:none!important}
-@media(prefers-reduced-motion:reduce){.page-scroll-progress{display:none}}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .page-scroll-progress{display:block}
+    .page-scroll-progress span{animation:astra-scroll-progress linear both;animation-timeline:scroll(root block)}
+    :is(.home-feature-strip,.home-features-heading,.home-feature-list article,.home-workspace-heading,.home-workspace-copy,.home-workspace-art,.home-path-heading,.home-path-step,.home-platforms-intro,.home-platform-cards article,.home-open-source,.home-end,.dl_state,.dl_sectionHeading,#latest-windows-release,.dl_notice,.dl_message,.dl_releaseGroup,.dl_faqHeading,.dl_faqItem,.dl_faqHelp,.license-document-heading):not(:focus-within){
+      animation:astra-scroll-arrive linear both;animation-timeline:view();animation-range:entry 0% entry 75%;
+    }
+    @keyframes astra-scroll-progress{to{transform:scaleX(1)}}
+    @keyframes astra-scroll-arrive{from{translate:0 12px}to{translate:0 0}}
+  }
+}

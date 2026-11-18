@@ -56,7 +56,7 @@ function HomeContent({ locale }: { locale: Locale }) {
     </section>
     <WorkspaceShowcase locale={locale} />
     <section className="home-path" aria-labelledby="path-title">
-      <div className="home-path-heading"><div><p className="home-section-label">{en ? "Getting started" : "开始使用"}</p><h2 id="path-title">{en ? <>A little preparation.<br />A lot more possibility.</> : <>准备就绪，<br />从容出发。</>}</h2></div><p>{en ? "New to SillyTavern? Start with the " : "刚开始使用 SillyTavern？先阅读"}<Link className="home-guide-link" href={`/${locale}/docs/installation`}>{en ? "Windows installation guide" : "Windows 安装指南"}</Link>{en ? "." : "。"}</p></div>
+      <div className="home-path-heading"><div><p className="home-section-label">{en ? "Getting started" : "开始使用"}</p><h2 id="path-title">{en ? <>A little preparation.<br />A lot more possibility.</> : <>准备就绪，<br />从容出发。</>}</h2></div><p>{en ? "New to SillyTavern? Start with the " : "刚开始使用 SillyTavern？先阅读"}<Link className="home-guide-link" href={`/${locale}/docs/installation`} prefetch={false}>{en ? "Windows installation guide" : "Windows 安装指南"}</Link>{en ? "." : "。"}</p></div>
       <div className="home-path-steps">{(en ? [
         { icon: Download, title: "Choose a release", body: "Find a Windows package that suits your needs on the downloads page." },
         { icon: Settings2, title: "Set things up", body: "Open the launcher and configure the environment and tavern instance." },

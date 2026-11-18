@@ -44,7 +44,6 @@ html[data-theme="dark"] {
 
 @media (prefers-reduced-motion: no-preference) {
   .site-theme-toggle svg { transition: opacity 180ms ease-out, transform 240ms var(--ease-out); }
-  /* HeroUI opts the page out of snapshots; opt in only for this reveal. */
   html[data-theme-reveal] { view-transition-name: root; }
   html[data-theme-reveal]::view-transition-old(root),
   html[data-theme-reveal]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }

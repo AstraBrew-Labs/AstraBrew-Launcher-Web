@@ -121,7 +121,7 @@
 .home-guide-link{color:var(--astra-blue-text);font-weight:700;text-decoration:underline;text-underline-offset:.18em}
 .home-guide-link:hover{color:var(--astra-ink)}
 .home-path-step-top{display:flex;justify-content:space-between;align-items:center;color:var(--astra-blue-text)}
-.home-path-step-top span{font-family:var(--font-numeric);font-size:40px;line-height:1;font-weight:800;color:var(--astra-blue);font-variant-numeric:tabular-nums}
+.home-path-step-top span{font-family:var(--font-numeric);font-size:40px;line-height:1;font-weight:800;color:var(--astra-blue-text);font-variant-numeric:tabular-nums}
 .home-path-step h3{margin:auto 0 10px;padding-top:44px;font-size:21px;line-height:1.4;font-weight:800}
 .home-path-step p{max-width:290px;color:var(--astra-stone);font-size:15px;line-height:1.8;margin:0}
 

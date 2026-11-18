@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "@heroui/react": "^3.2.7",
-    "@heroui/styles": "^3.2.7",
     "fumadocs-core": "^16.19.4",
     "fumadocs-mdx": "^15.6.3",
     "fumadocs-ui": "^16.19.4",

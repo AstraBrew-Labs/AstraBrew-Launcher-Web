@@ -1,5 +1,6 @@
 export const routeRevealEvent = "astrabrew:route-reveal";
-const pageSelector = "[data-transit-path], main[data-transit-message]";
+export const bootStartEvent = "astrabrew:boot-start";
+export const pageSelector = "[data-transit-path], main[data-transit-message]";
 const normalize = (path: string) => path.replace(/\/$/, "");
 
 export function findPage(path: string, scope: ParentNode = document, previous?: HTMLElement) {

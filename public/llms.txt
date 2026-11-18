@@ -1,0 +1,17 @@
+# AstraBrew Launcher
+
+> An open-source Windows launcher that sets up and starts SillyTavern. This site provides downloads, installation guides, and license information.
+
+## User guide
+
+- [User guide](https://launcher.astrabrew.cn/en/docs): Product overview and where to start.
+- [Installation](https://launcher.astrabrew.cn/en/docs/installation): Windows setup and first launch.
+- [Downloads](https://launcher.astrabrew.cn/en/download): Releases and available platforms.
+- [License](https://launcher.astrabrew.cn/en/license): Permissions, conditions, and the full license text.
+
+## 中文文档
+
+- [使用文档](https://launcher.astrabrew.cn/zh/docs): 启动器简介与使用入口。
+- [安装指南](https://launcher.astrabrew.cn/zh/docs/installation): Windows 安装和首次启动。
+- [下载中心](https://launcher.astrabrew.cn/zh/download): 发行版本与平台支持。
+- [开源协议](https://launcher.astrabrew.cn/zh/license): 权限、适用条件和协议全文。

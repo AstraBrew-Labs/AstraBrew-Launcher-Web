@@ -6,8 +6,6 @@ import { affectsPage, findPage, isOnScreen } from './page-elements'
 export function warmDestination(path: string) {
   const segment = path.split('/')[2] || 'home'
   const region = document.querySelector<HTMLElement>('[data-request-region]')?.dataset.requestRegion
-  void document.fonts.load('1em Nunito').catch(() => {})
-  void document.fonts.load('1em "ZCOOL KuaiLe"').catch(() => {})
   if (isRegion(region) && (segment === 'download' || (segment === 'home' && /windows/i.test(navigator.userAgent)))) {
     const store = releaseStore(region)
     const fresh = store.sync()

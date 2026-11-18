@@ -1,6 +1,6 @@
 # AstraBrew Launcher website
 
-星酿启动器官网，使用 Next.js App Router、HeroUI v3、GSAP 和 Lucide。运行环境需要 Bun。
+星酿启动器官网，使用 Next.js App Router、Fumadocs、GSAP 和 Lucide。运行环境需要 Bun。
 
 ```sh
 bun install

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import { ThemeToggle } from "./theme-toggle";
 import { Globe2 } from "lucide-react";
 import Image from "next/image";
@@ -23,7 +22,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     }
     if (!cookies.some(([key]) => key === REGION_COOKIE)) {
       saveBrowserRegion(regionFromBrowser(navigator.language, Intl.DateTimeFormat().resolvedOptions().timeZone));
-      router.refresh();
+      // Only refresh when the current page needs region-specific releases immediately.
+      if (/^\/(?:en|zh)\/download\/?$/.test(location.pathname) ||
+        (/^\/(?:en|zh)\/?$/.test(location.pathname) && /windows/i.test(navigator.userAgent))) router.refresh();
     }
   }, [router]);
   const other: Locale = en ? "zh" : "en";
@@ -38,9 +39,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     <nav className="site-nav" aria-label={en ? "Main navigation" : "主导航"}>
       <Link href={`/${locale}`}>{en ? "Features" : "产品介绍"}</Link>
       <Link href={`/${locale}/download`}>{en ? "Downloads" : "版本下载"}</Link>
-      <Link href={`/${locale}/docs`}>{en ? "User guide" : "使用文档"}</Link>
+      <Link href={`/${locale}/docs`} prefetch={false}>{en ? "User guide" : "使用文档"}</Link>
       <Link href={`/${locale}/license`}>{en ? "License" : "开源协议"}</Link>
     </nav>
-    <div className="site-actions"><Button variant="ghost" className="site-language" aria-label={en ? "Switch to Chinese" : "Switch to English"} onPress={switchLanguage}><Globe2 size={17} aria-hidden="true" /><span className="site-language-label">{en ? "中文" : "EN"}</span></Button><Link className="site-header-cta" href={`/${locale}/download`}>{en ? "Get Launcher" : "获取启动器"}</Link><ThemeToggle locale={locale} /></div>
+    <div className="site-actions"><button type="button" className="site-language" aria-label={en ? "中文 — Switch to Chinese" : "EN — 切换到英文"} onClick={switchLanguage}><Globe2 size={17} aria-hidden="true" /><span className="site-language-label">{en ? "中文" : "EN"}</span></button><Link className="site-header-cta" href={`/${locale}/download`}>{en ? "Get Launcher" : "获取启动器"}</Link><ThemeToggle locale={locale} /></div>
   </div></header>;
 }

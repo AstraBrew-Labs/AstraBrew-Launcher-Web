@@ -8,8 +8,12 @@ html[data-theme="dark"] .boot-screen{color:#b2d4df}
 html[data-theme="dark"] .boot-backdrop{background:radial-gradient(ellipse at center,#243647 8%,#192d34 57%,#141a25)}
 html[data-theme="dark"] .boot-orbits i{border-color:#56838b78}
 html[data-theme="dark"] .boot-signal i{background:#7fddbe}
+@media(prefers-reduced-motion:no-preference){
 .reload-intro-active .boot-screen{display:grid}
-@media(prefers-reduced-motion:no-preference){.reload-intro-active .site-logo img{opacity:0}}
+.reload-intro-active .site-logo img{opacity:0}
+.reload-intro-active .boot-screen:not([data-running]) .boot-flare{animation:boot-beacon .75s ease-in-out infinite alternate}
+}
+@keyframes boot-beacon{from{transform:scale(.65);opacity:.6}to{transform:scale(1.25);opacity:1}}
 .boot-ignition{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
 .boot-ignition i{grid-area:1/1}
 .boot-flare{width:18px;aspect-ratio:1;background:#36ae94;clip-path:polygon(50% 0,61% 38%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 38%)}

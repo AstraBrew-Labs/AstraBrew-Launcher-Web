@@ -126,7 +126,7 @@ export function DownloadPage({ locale, region, initialPlatform }: { locale: Loca
   const source = region === "cn" ? "GitCode" : "GitHub";
 
   return <main data-transit-path={`/${locale}/download`} id="main-content" className="dl_page" data-release-region={region}>
-    <PageMotion page="download" platform={platform} />
+    <PageMotion page="download" />
     <div className="dl_intro">
       <p className="dl_kicker">AstraBrew Launcher</p>
       <h1>{zh ? "下载星酿启动器" : "Download AstraBrew Launcher"}</h1>

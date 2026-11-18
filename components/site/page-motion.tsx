@@ -3,11 +3,10 @@
 import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { isLocaleMotionPage } from "./locale-exchange";
 import { affectsPage, findPage, isOnScreen, routeRevealEvent } from "./page-elements";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(useGSAP);
 
 const entries = {
   home: { copy: ".home-name, .home-lead", surface: ".home-actions", visual: ".home-visual-inner" },
@@ -34,7 +33,7 @@ export function DocsMotionReady() {
 }
 
 /** The docs marker lives in the shared layout so changing articles doesn't replay the entrance. */
-export function PageMotion({ page, platform }: { page: Page; platform?: string }) {
+export function PageMotion({ page }: { page: Page }) {
   const marker = useRef<HTMLDivElement>(null);
   useGSAP(() => {
     const media = gsap.matchMedia();
@@ -44,6 +43,9 @@ export function PageMotion({ page, platform }: { page: Page; platform?: string }
       if (!scope) return;
       const path = scope.dataset.transitPath ?? location.pathname;
       if (isLocaleMotionPage(path)) return;
+      // A direct page load can paint its server HTML immediately. Stage entrances
+      // only when a curtain is already covering the destination.
+      if (!html.classList.contains("route-transition-active")) return;
       const observer = new MutationObserver(records => { if (records.some(affectsPage)) play(); });
       const stop = () => {
         observer.disconnect();
@@ -76,8 +78,7 @@ export function PageMotion({ page, platform }: { page: Page; platform?: string }
           if (visual.length) intro.from(visual, { x: 16, scale: .983, opacity: .58, duration: .56 }, "arrive+=.04");
         });
 
-        if (html.classList.contains("reload-intro-active") ||
-          document.querySelector(".transit[open][data-transit-phase]:not([data-transit-phase=reveal])")) return;
+        if (document.querySelector(".transit[open][data-transit-phase]:not([data-transit-phase=reveal])")) return;
         stop();
         intro?.play();
       };
@@ -89,73 +90,6 @@ export function PageMotion({ page, platform }: { page: Page; platform?: string }
     });
     return () => media.revert();
   }, { dependencies: [page], revertOnUpdate: true });
-
-  useGSAP(() => {
-    if (page === "docs") return;
-    const media = gsap.matchMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      const root = marker.current?.closest<HTMLElement>("[data-transit-path], main[data-transit-message]");
-      if (!root) return;
-      // Reattach scrubbed effects at their current scroll position, without easing in from zero.
-      const localeVisit = isLocaleMotionPage(root.dataset.transitPath);
-      // Animate meaningful content blocks, not nested controls or long-form text.
-      const groups = page === "home"
-        ? [".home-feature-strip", ".home-features-heading", ".home-feature-list article", ".home-workspace-heading", ".home-workspace-copy", ".home-workspace-art", ".home-path-heading", ".home-path-step", ".home-platforms-intro", ".home-platform-cards article", ".home-open-source", ".home-end"]
-        : page === "download"
-          ? [".dl_state", ".dl_sectionHeading", "#latest-windows-release", ".dl_notice", ".dl_message", ".dl_releaseGroup", ".dl_faqHeading", ".dl_faqItem", ".dl_faqHelp"]
-          : page === "license" ? [".license-document-heading"] : [];
-      const targets = groups.length ? Array.from(root.querySelectorAll<HTMLElement>(groups.join(", "))) : [];
-      const footer = document.querySelector<HTMLElement>(".site-footer-inner");
-      if (footer) targets.push(footer);
-      targets.forEach((element) => {
-        element.classList.add("scroll-motion-item");
-        gsap.timeline({
-          scrollTrigger: {
-            trigger: element,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: localeVisit || 0.35,
-            invalidateOnRefresh: true,
-          },
-        })
-          .fromTo(element, { y: 18, opacity: 0.72 }, { y: 0, opacity: 1, duration: 0.16, ease: "none" })
-          .to(element, { y: 0, opacity: 1, duration: 0.68, ease: "none" })
-          .to(element, { y: -18, opacity: 0.72, duration: 0.16, ease: "none" });
-      });
-      if (page === "home") {
-        const artwork = root.querySelector<HTMLElement>(".home-workspace-art");
-        const floating = artwork?.querySelector<HTMLElement>(".home-workspace-floating");
-        const glow = artwork?.querySelector<HTMLElement>(".home-workspace-glow");
-        if (artwork && floating && glow) {
-          gsap.fromTo(floating, { y: 20 }, { y: -20, ease: "none", scrollTrigger: { trigger: artwork, start: "top bottom", end: "bottom top", scrub: localeVisit || 0.8 } });
-          gsap.fromTo(glow, { x: -35, scale: 0.9 }, { x: 35, scale: 1.1, ease: "none", scrollTrigger: { trigger: artwork, start: "top bottom", end: "bottom top", scrub: localeVisit || 1 } });
-        }
-      }
-      const progress = marker.current?.firstElementChild;
-      if (progress) {
-        gsap.fromTo(progress, { scaleX: 0 }, {
-          scaleX: 1, ease: "none",
-          scrollTrigger: { trigger: document.documentElement, start: "top top", end: "bottom bottom", scrub: localeVisit || 0.2 },
-        });
-      }
-      if (localeVisit) ScrollTrigger.refresh();
-      let frame = 0;
-      const refresh = () => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => ScrollTrigger.refresh());
-      };
-      const resize = new ResizeObserver(refresh);
-      resize.observe(root);
-      document.addEventListener("toggle", refresh, true);
-      return () => {
-        cancelAnimationFrame(frame);
-        resize.disconnect();
-        document.removeEventListener("toggle", refresh, true);
-        targets.forEach((element) => element.classList.remove("scroll-motion-item"));
-      };
-    });
-    return () => media.revert();
-  }, { dependencies: [page, platform], revertOnUpdate: true });
 
   if (page === "docs") return <div ref={marker} hidden />;
   return <div ref={marker} className="page-scroll-progress" aria-hidden="true"><span /></div>;

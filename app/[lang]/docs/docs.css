@@ -1,3 +1,9 @@
+@import "tailwindcss" source(none);
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@source "./";
+@source "../../../content/docs";
+
 /* Include portalled mobile menus in the same palette as the site theme. */
 :root {
   --color-fd-background: var(--astra-white); --color-fd-foreground: var(--astra-ink);
