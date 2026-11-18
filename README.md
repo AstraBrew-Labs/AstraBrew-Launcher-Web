@@ -18,6 +18,13 @@ bun run dev
 
 下载数据按地区保存在浏览器本地，有效期 30 分钟；过期时先展示已有数据并在后台同步。打开下载页可手动刷新；双源不可用时保留上一次的列表。服务端合并并发请求并限制短时间重复访问发布源。
 
+## 网站访问统计
+
+- **Vercel Web Analytics**：在 Vercel 项目的 **Analytics** 页面点击 **Enable**，确保项目开放系统环境变量（代码用 `VERCEL_ENV=production` 区分生产与预览），然后重新部署。官方 Next.js 集成已放在中英文共享布局，无需另填站点 ID。
+- **Cloudflare Web Analytics**：在 **Web Analytics** 中添加或选择域名，选择手动安装 JS Snippet，把片段里 `data-cf-beacon` 的 `token` 配置为 `CLOUDFLARE_WEB_ANALYTICS_TOKEN`（Vercel 请选择 **Production** 环境），然后重新部署。如果 Cloudflare 已自动注入脚本，请把该变量留空，避免重复统计。
+
+仓库只集成页面访问统计，不发送自定义事件。应用不会在本地开发或 Vercel Preview 中加载这两段统计脚本；手动集成的 Cloudflare 脚本在页面加载后的空闲时段启动，不阻塞首屏。如需排除特定地区或接入同意机制，请在上线前按站点的隐私要求配置。
+
 ## 使用文档
 
 `/zh/docs` 和 `/en/docs` 使用 Fumadocs 渲染，共享网站的语言和主题。文档内切换文章不播放全屏转场。文档内容在 `content/docs/`：

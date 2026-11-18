@@ -16,6 +16,8 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/api/") ||
     pathname.startsWith("/brand/") ||
     pathname.startsWith("/fonts/") ||
+    pathname.startsWith("/_vercel/insights/") ||
+    pathname === "/cdn-cgi/rum" ||
     pathname === "/llms.txt" ||
     pathname.startsWith("/.well-known/") ||
     ["/icon.svg", "/file.svg", "/globe.svg", "/next.svg", "/vercel.svg", "/window.svg"].includes(pathname) ||

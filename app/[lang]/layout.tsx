@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { SiteAnalytics } from "@/components/site/site-analytics";
 import { SiteHeader } from "@/components/site/site-header";
 import { RouteTransition } from "@/components/site/route-transition";
 import { BootScreenStyles } from "@/components/site/boot-screen-styles";
@@ -33,6 +34,7 @@ export default async function RootLayout({ children, params }: { children: React
         <SiteHeader locale={lang} />
         {children}
         <SiteFooter locale={lang} />
+        <SiteAnalytics />
       </body>
     </html>
   );
