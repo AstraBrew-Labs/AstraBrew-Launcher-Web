@@ -1,0 +1,26 @@
+.transit {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; overflow: hidden; overscroll-behavior: contain;
+  background: transparent; color: var(--astra-blue-text); outline: 0;
+  --rail: clamp(18px, 4.6vmin, 64px);
+}
+.transit::backdrop { background: transparent; }
+.transit-slats { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(5,1fr); }
+.transit-slats i { margin-block: -1px; background: var(--astra-cloud); border-inline: 4px solid var(--astra-green); box-sizing: content-box; margin-inline: -4px; }
+.transit-field { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 50% 42%, transparent 8%, var(--astra-cloud) 79%),
+  radial-gradient(circle, var(--astra-blue-mist) 1px, transparent 1.4px) 50% 50% / 28px 28px,
+  radial-gradient(ellipse at 50% 47%, var(--astra-white), var(--astra-green-soft) 56%); }
+.transit-trails { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .66; }
+.transit-frame { position: absolute; inset: var(--rail); display: grid; grid-template-rows: auto minmax(0,1fr) auto; }
+.transit-meta,.transit-kicker { font: 600 clamp(10px,1.4vmin,14px)/1.4 ui-monospace,monospace; letter-spacing: .15em; }
+.transit-meta { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-block-start: 1px solid var(--astra-line-strong); padding-block: 13px; }
+.transit-meta b,.transit-meta strong { color: var(--astra-green-text); } .transit-meta em { font-style: normal; color: var(--astra-stone); }
+.transit-center { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: clamp(5px,1.2vmin,14px); }
+.transit-scope { display: block; width: min(36vmin,300px); overflow: visible; }
+.transit-kicker { color: var(--astra-green-text); letter-spacing: .4em; }
+.transit-title { font: 750 clamp(30px,7vmin,86px)/1.15 var(--font-numeric),var(--font-body); letter-spacing: -.035em; color: var(--astra-ink); }
+.transit-footer { border-block-start: 0; border-block-end: 1px solid var(--astra-line-strong); }
+.transit-meter { position: relative; flex: 1; max-width: 230px; height: 3px; background: var(--astra-line); overflow: hidden; }
+.transit-meter i { display:block; width: 42%; height:100%; background: var(--astra-green-text); }
+@media (max-width: 500px) { .transit-meta em { display:none; } .transit-scope { width: min(58vw,30vh); } }

@@ -1,0 +1,16 @@
+/* Include portalled mobile menus in the same palette as the site theme. */
+:root {
+  --color-fd-background: var(--astra-white); --color-fd-foreground: var(--astra-ink);
+  --color-fd-muted: var(--astra-cloud); --color-fd-muted-foreground: var(--astra-stone);
+  --color-fd-popover: var(--astra-white); --color-fd-popover-foreground: var(--astra-ink);
+  --color-fd-card: var(--astra-cloud); --color-fd-card-foreground: var(--astra-ink);
+  --color-fd-border: var(--astra-line); --color-fd-primary: var(--astra-blue-text);
+  --color-fd-primary-foreground: var(--astra-white); --color-fd-secondary: var(--astra-cloud);
+  --color-fd-secondary-foreground: var(--astra-ink); --color-fd-accent: var(--astra-blue-soft);
+  --color-fd-accent-foreground: var(--astra-blue-text); --color-fd-ring: var(--focus-ring);
+}
+#nd-docs-layout { background: var(--color-fd-background); border-block: 1px solid var(--color-fd-border); }
+.guide-loading { grid-area: main; width: 100%; max-width: 900px; justify-self: center; padding: clamp(24px, 4vw, 56px) 24px; }
+.guide-loading i { display: block; height: .85rem; width: 88%; margin-bottom: .8rem; border-radius: 6px; background: var(--astra-line); }
+.guide-loading i:first-child { width: 42%; height: 2rem; margin-bottom: 1.5rem; }
+.guide-loading i:last-child { width: 65%; }

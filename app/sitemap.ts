@@ -1,19 +1,20 @@
-import type { MetadataRoute } from 'next'
-import { localizedPath, SITE_LANGUAGES, siteUrl } from '@/lib/site-i18n'
-
-const SITE_PAGES = ['/', '/download', '/guide', '/about'] as const
+import type { MetadataRoute } from "next";
+import { docsSource } from "@/lib/docs";
+import { docsPagePaths } from "@/lib/docs-seo";
+import { absoluteLocaleUrls, languageAlternates, siteOrigin, sitePagePaths, sitePages } from "@/lib/site-metadata";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return SITE_LANGUAGES.flatMap((language) => SITE_PAGES.map((path) => ({
-    url: siteUrl(localizedPath(language, path)),
-    changeFrequency: 'weekly' as const,
-    priority: path === '/' ? 1 : 0.8,
-    alternates: {
-      languages: {
-        'zh-CN': siteUrl(localizedPath('zh', path)),
-        en: siteUrl(localizedPath('en', path)),
-        'x-default': siteUrl(localizedPath('zh', path)),
-      },
-    },
-  })))
+  const origin = siteOrigin();
+  if (!origin) return [];
+
+  const guideSlugs = new Map<string, string[]>();
+  for (const { pages } of docsSource.getLanguages()) {
+    for (const page of pages) guideSlugs.set(JSON.stringify(page.slugs), page.slugs);
+  }
+
+  return [...sitePages.map(sitePagePaths), ...Array.from(guideSlugs.values(), docsPagePaths)].flatMap((paths) => {
+    const urls = absoluteLocaleUrls(paths, origin);
+    const languages = languageAlternates(urls);
+    return Object.values(urls).map((url) => ({ url, ...(languages ? { alternates: { languages } } : {}) }));
+  });
 }

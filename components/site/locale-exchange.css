@@ -1,0 +1,56 @@
+/* Only the named text gets snapshots; the page, logo and artwork do not. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(locale-title),
+  ::view-transition-group(locale-lead),
+  ::view-transition-group(locale-label) {
+    animation-duration: 300ms;
+    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  ::view-transition-old(locale-title),
+  ::view-transition-old(locale-lead),
+  ::view-transition-old(locale-label),
+  ::view-transition-new(locale-title),
+  ::view-transition-new(locale-lead),
+  ::view-transition-new(locale-label) {
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(locale-title),
+  ::view-transition-old(locale-lead) {
+    animation: locale-ink-out 130ms cubic-bezier(.4, 0, .35, 1) both;
+  }
+
+  ::view-transition-new(locale-title) {
+    animation: locale-ink-in 225ms 75ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  ::view-transition-new(locale-lead) {
+    animation: locale-ink-in 205ms 95ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  ::view-transition-old(locale-label) {
+    animation: locale-label-out 130ms ease both;
+  }
+
+  ::view-transition-new(locale-label) {
+    animation: locale-label-in 220ms 65ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  @keyframes locale-ink-out {
+    to { opacity: 0; clip-path: inset(0 0 0 100%); }
+  }
+
+  @keyframes locale-ink-in {
+    from { opacity: .4; clip-path: inset(0 100% 0 0); }
+    to { opacity: 1; clip-path: inset(0); }
+  }
+
+  @keyframes locale-label-out {
+    to { opacity: 0; transform: translateY(-5px); }
+  }
+
+  @keyframes locale-label-in {
+    from { opacity: 0; transform: translateY(5px); }
+  }
+}

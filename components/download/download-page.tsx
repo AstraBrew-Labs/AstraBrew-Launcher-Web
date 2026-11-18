@@ -1,695 +1,154 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { ChevronDown, ChevronUp, CircleHelp, RefreshCw } from 'lucide-react'
-import { Accordion, Alert, Button, Skeleton, Tabs } from '@heroui/react'
-import {
-  AppleLogo,
-  CheckCircle,
-  Clock,
-  DeviceMobile,
-  DownloadSimple,
-  FileZip,
-  Monitor,
-  WindowsLogo,
-} from '@phosphor-icons/react'
-import { useReleases } from '@/hooks/use-releases'
-import { HelpContent, HelpTip } from '@/components/help-content'
-import { useSitePreferences } from '@/components/site-preferences'
-import { getInstallationFaqItems } from '@/lib/installation-faq'
-import { localizedPath, siteUrl } from '@/lib/site-i18n'
-import {
-  describeReleaseAsset,
-  formatFileSize,
-  formatReleaseDate,
-  getDownloadAssets,
-  type ReleaseInfo,
-  type ReleasePlatform,
-} from '@/lib/releases'
+import { useState, useSyncExternalStore } from "react";
+import { Apple, ArrowDownToLine, Archive, Box, ChevronDown, ExternalLink, Monitor, PackageCheck } from "lucide-react";
+import { PageMotion } from "@/components/site/page-motion";
+import type { Locale, Region } from "@/lib/i18n";
+import { compareReleases, getLatestStableRelease, getReleaseCategory, type AssetKind, type Release, type ReleaseAsset, type ReleaseCategory } from "@/lib/releases";
+import { useReleases } from "@/lib/use-releases";
+import "./download.css";
 
-const platforms = [
-  {
-    os: 'windows' as const,
-    label: 'Windows',
-    icon: WindowsLogo,
-    requirement: 'Windows 10 或更高版本 (64-bit)',
-    requirementEn: 'Windows 10 or later (64-bit)',
-  },
-  {
-    os: 'mac' as const,
-    label: 'macOS',
-    icon: AppleLogo,
-    requirement: 'macOS 12 Monterey 或更高版本',
-    requirementEn: 'macOS 12 Monterey or later',
-  },
-]
+type Platform = "windows" | "mac" | "other";
 
-type TabType = 'latest' | 'all'
-
-function isMobile(): boolean {
-  if (typeof window === 'undefined') return false
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(window.navigator.userAgent)
+function detectPlatform(): Platform {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/windows/.test(ua)) return "windows";
+  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|ipod/.test(ua)) return "mac";
+  return "other";
 }
 
-function ReleaseLoading() {
-  const { t } = useSitePreferences()
+const subscribePlatform = () => () => {};
+const serverPlatform = (): Platform => "other";
 
-  return (
-    <div className="space-y-5" aria-label={t('正在加载发布信息', 'Loading release information')}>
-      <div className="glass-card rounded-2xl p-6 space-y-5">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-32 rounded-lg" />
-          <Skeleton className="h-3 w-44 rounded" />
-        </div>
-        <div className="space-y-3">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-4 w-full rounded" />
-          ))}
-        </div>
-      </div>
-      {Array.from({ length: 2 }).map((_, index) => (
-        <div key={index} className="glass-card flex items-center gap-4 rounded-xl px-5 py-4">
-          <Skeleton className="size-9 shrink-0 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-3/5 rounded" />
-            <Skeleton className="h-3 w-2/5 rounded" />
-          </div>
-          <Skeleton className="h-8 w-20 rounded-lg" />
-        </div>
-      ))}
+const sourceName = (source: string) => source === "gitcode" ? "GitCode" : "GitHub";
+
+function sizeText(bytes: number | null) {
+  if (bytes === null) return null;
+  return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function AssetLink({ asset, locale }: { asset: ReleaseAsset; locale: Locale }) {
+  const zh = locale === "zh";
+  const names: Record<AssetKind, [string, string]> = {
+    installer: ["安装程序", "Installer"],
+    msi: ["MSI 安装包", "MSI installer"],
+    portable: ["便携版", "Portable"],
+  };
+  const Icon = asset.kind === "portable" ? Archive : asset.kind === "msi" ? Box : PackageCheck;
+  const size = sizeText(asset.size);
+  return <a className="dl_asset" href={asset.url}>
+    <span className="dl_assetIcon"><Icon size={18} aria-hidden="true" /></span>
+    <span className="dl_assetCopy"><strong>{names[asset.kind][zh ? 0 : 1]}</strong><small>{asset.name}</small></span>
+    <span className="dl_assetMeta">{size && <span>{size}</span>}<span>{sourceName(asset.source)}</span></span>
+    <ArrowDownToLine className="dl_assetArrow" size={18} aria-hidden="true" />
+  </a>;
+}
+
+
+function categoryLabel(category: ReleaseCategory, zh: boolean) {
+  if (category === "stable") return zh ? "正式版（稳定版）" : "Stable";
+  if (category === "beta") return zh ? "测试版" : "Beta";
+  return zh ? "预览版" : "Preview";
+}
+
+function ReleaseCard({ release, locale, latest = false, pinned = false }: { release: Release; locale: Locale; latest?: boolean; pinned?: boolean }) {
+  const zh = locale === "zh";
+  const category = getReleaseCategory(release.channel);
+  const date = release.publishedAt && !Number.isNaN(Date.parse(release.publishedAt)) ? new Intl.DateTimeFormat(zh ? "zh-CN" : "en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(release.publishedAt)) : null;
+  return <details className="dl_release" open={latest ? true : undefined}>
+    <summary><span className="dl_releaseVersion"><strong>{release.tag}</strong><span className={`dl_channel dl_channel--${category}`}>{categoryLabel(category, zh)}</span>{latest && <span className="dl_latest">{pinned ? (zh ? "最新正式版" : "Latest stable") : (zh ? "此分类最新" : "Latest in channel")}</span>}</span><span className="dl_releaseSummary">{date && <time dateTime={release.publishedAt ?? undefined}>{date}</time>}<ChevronDown size={20} aria-hidden="true" /></span></summary>
+    <div className="dl_releaseBody">{release.assets.length > 0 ? <div className="dl_assets">{release.assets.map((asset) => <AssetLink key={`${asset.name}-${asset.source}`} asset={asset} locale={locale} />)}</div> : <p className="dl_noAssets">{zh ? "此版本暂无可用的 Windows 安装文件。" : "No Windows installation files are available for this release."}</p>}
+      <a className="dl_releaseLink" href={release.url} target="_blank" rel="noopener noreferrer">{zh ? "查看发布说明" : "View release notes"} <ExternalLink size={14} aria-hidden="true" /></a>
     </div>
-  )
+  </details>;
 }
 
-function ReleaseError({
-  message,
-  isRefreshing,
-  onReload,
-}: {
-  message: string
-  isRefreshing: boolean
-  onReload: () => void
-}) {
-  const { t } = useSitePreferences()
-
-  return (
-    <Alert status="danger" className="glass-card rounded-xl">
-      <Alert.Indicator />
-      <Alert.Content>
-        <Alert.Title>{t('无法获取发布信息', 'Unable to load releases')}</Alert.Title>
-        <Alert.Description>{message}</Alert.Description>
-      </Alert.Content>
-      <Button
-        isPending={isRefreshing}
-        onPress={onReload}
-        size="sm"
-        variant="danger"
-      >
-        <RefreshCw className="size-4" />
-        {t('重新加载', 'Reload')}
-      </Button>
-    </Alert>
-  )
+function ReleaseList({ releases, locale, uncertain }: { releases: Release[]; locale: Locale; uncertain: boolean }) {
+  const zh = locale === "zh";
+  const latestStable = getLatestStableRelease(releases);
+  const categories: ReleaseCategory[] = ["stable", "beta", "preview"];
+  const descriptions: Record<ReleaseCategory, string> = zh ? {
+    stable: "面向日常使用的正式发布版本，侧重稳定性。",
+    beta: "用于测试与反馈的版本，可以提前体验功能，使用中可能遇到问题。",
+    preview: "用于提前体验尚在开发中的内容，功能和表现可能变化。",
+  } : {
+    stable: "Formal releases intended for everyday use, with a focus on stability.",
+    beta: "Releases for testing and feedback. You can try features early, but may encounter issues.",
+    preview: "An early look at work in progress; features and behavior may change.",
+  };
+  return <div className="dl_releaseList">
+    {latestStable && <div id="latest-windows-release"><ReleaseCard release={latestStable} locale={locale} latest pinned /></div>}
+    <div className="dl_releaseGroups">{categories.map((category) => {
+      const [latest, ...older] = releases.filter((release) => getReleaseCategory(release.channel) === category).sort(compareReleases);
+      return <section className="dl_releaseGroup" key={category} aria-labelledby={`release-category-${category}`}>
+        <div className="dl_categoryHeader"><div><h3 id={`release-category-${category}`}><span className={`dl_categoryDot dl_categoryDot--${category}`} aria-hidden="true" />{categoryLabel(category, zh)}</h3><p>{descriptions[category]}</p></div>
+          {!latest && <span className="dl_categoryEmpty">{uncertain ? (zh ? "暂无法确认" : "Status unavailable") : (zh ? "暂未发布" : "Not yet released")}</span>}
+        </div>
+        {latest && <div className="dl_categoryFeatured"><ReleaseCard release={latest} locale={locale} latest /></div>}
+        {older.length > 0 && <details className="dl_moreReleases">
+          <summary><span>{zh ? "查看更多版本" : "View more releases"} <small>({older.length})</small></span><ChevronDown size={19} aria-hidden="true" /></summary>
+          <div className="dl_releaseList">{older.map((release) => <ReleaseCard key={`${release.version}-${release.channel}-${release.channelNumber}`} release={release} locale={locale} />)}</div>
+        </details>}
+      </section>;
+    })}</div>
+  </div>;
 }
 
-function LatestReleaseSection({
-  release,
-  platform,
-  platformLabel,
-  requirement,
-  type,
-  onReload,
-}: {
-  release: ReleaseInfo | null
-  platform: ReleasePlatform
-  platformLabel: string
-  requirement: string
-  type: 'formal' | 'beta'
-  onReload: () => void
-}) {
-  const { language, t } = useSitePreferences()
-  const isBeta = type === 'beta'
-  const typeLabel = isBeta ? t('测试版', 'Beta') : t('正式版', 'Stable')
-  const assets = getDownloadAssets(release, platform)
-
-  return (
-    <section
-      key={`${type}-${platform}`}
-      className="space-y-5"
-    >
-      <h2 className="text-lg font-bold text-foreground">{t(`最新${typeLabel}`, `Latest ${typeLabel}`)}</h2>
-
-      {release ? (
-        <>
-          <div
-            className="glass-card rounded-2xl p-6"
-            style={{
-              border: isBeta
-                ? '1px solid oklch(0.74 0.10 212 / 0.3)'
-                : '1px solid oklch(0.70 0.12 188 / 0.3)',
-            }}
-          >
-            <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div>
-                <div className="mb-1 flex items-center gap-3">
-                  <span className="text-2xl font-black text-gradient">{release.version}</span>
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                    style={isBeta
-                      ? {
-                          background: 'oklch(0.74 0.10 212 / 0.12)',
-                          color: 'var(--brand-blue-text)',
-                          border: '1px solid oklch(0.74 0.10 212 / 0.25)',
-                        }
-                      : {
-                          background: 'oklch(0.70 0.12 188 / 0.15)',
-                          color: 'var(--brand-green-text)',
-                          border: '1px solid oklch(0.70 0.12 188 / 0.3)',
-                        }}
-                  >
-                    {typeLabel}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock weight="fill" className="size-3.5" />
-                  {t('发布于', 'Released')} {formatReleaseDate(release.publishedAt, language === 'zh' ? 'zh-CN' : 'en-US')}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('更新亮点', 'Highlights')}</h3>
-              <ul className="space-y-2">
-                {release.notes.map((item, index) => (
-                  <li key={`${item}-${index}`} className="flex items-start gap-2.5 text-sm text-foreground">
-                    <CheckCircle weight="fill" className="mt-0.5 size-4 shrink-0 text-[oklch(0.70_0.12_188)]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">{t('系统要求', 'System requirements')}: {requirement}</p>
-            {assets.length ? assets.map((asset) => (
-              <a
-                key={asset.id}
-                href={asset.downloadUrl}
-                download
-                className="group flex items-center justify-between gap-4 glass-card rounded-xl px-5 py-4 hover:border-[oklch(0.74_0.10_212/0.5)] transition-all duration-200 hover:-translate-y-0.5"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-lg"
-                    style={{ background: 'oklch(0.74 0.10 212 / 0.12)', border: '1px solid oklch(0.74 0.10 212 / 0.2)' }}
-                  >
-                    <FileZip weight="fill" className="size-4 text-[oklch(0.74_0.10_212)]" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate font-mono text-sm font-medium text-foreground">{asset.name}</div>
-                    <div className="text-xs text-muted-foreground">{describeReleaseAsset(asset, platform, language)}</div>
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-4">
-                  <span className="hidden font-mono text-xs text-muted-foreground sm:block">{formatFileSize(asset.size, language)}</span>
-                  <div className="flex items-center gap-1.5 rounded-lg bg-brand-gradient px-3 py-1.5 text-xs font-semibold text-white group-hover:shadow-md">
-                    <DownloadSimple weight="bold" className="size-3.5" />
-                    {t('下载', 'Download')}
-                  </div>
-                </div>
-              </a>
-            )) : (
-              <Alert status="warning" className="rounded-xl">
-                <Alert.Indicator />
-                <Alert.Content>
-                  <Alert.Title>{t('该版本暂无安装附件', 'No installer assets for this release')}</Alert.Title>
-                  <Alert.Description>{t('可前往 GitHub Releases 页面查看完整发布信息。', 'Open the GitHub Releases page for complete release details.')}</Alert.Description>
-                </Alert.Content>
-              </Alert>
-            )}
-          </div>
-
-          <div
-            className="flex flex-wrap items-center gap-2.5 rounded-xl px-4 py-3 text-xs text-muted-foreground"
-            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
-          >
-            <CheckCircle weight="fill" className="size-4 shrink-0 text-[oklch(0.70_0.12_188)]" />
-            {t('安装包来自官方 GitHub Release，完整校验信息可在', 'Installers come from the official GitHub Release. View complete verification details on the')}
-            <a
-              href={release.htmlUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[oklch(0.74_0.10_212)] hover:underline"
-            >
-              {t('发布页面', 'release page')}
-            </a>
-            {t('查询。', '.')}
-          </div>
-        </>
-      ) : (
-        <Alert status="warning" className="glass-card rounded-xl">
-          <Alert.Indicator />
-          <Alert.Content>
-            <Alert.Title>{t(`暂无 ${platformLabel} ${typeLabel}`, `No ${platformLabel} ${typeLabel} release`)}</Alert.Title>
-            <Alert.Description>{t('请切换平台或稍后重新加载发布数据。', 'Switch platforms or reload the release data later.')}</Alert.Description>
-          </Alert.Content>
-          <Button onPress={onReload} size="sm" variant="outline">{t('重新加载', 'Reload')}</Button>
-        </Alert>
-      )}
-    </section>
-  )
+function WindowsFaq({ locale }: { locale: Locale }) {
+  const zh = locale === "zh";
+  const questions = zh ? [
+    { question: "应该下载哪一种安装包？", answer: "如果希望通过安装向导完成安装，可以选择安装程序（.exe）或 MSI 安装包；如果希望使用便携包，可以选择 .zip。具体提供的文件请以各版本的下载列表和发布说明为准。" },
+    { question: "下载了 ZIP 便携包，接下来怎么做？", answer: "先将压缩包完整解压到文件夹，再按照该版本的发布说明启动。请不要直接在压缩包预览窗口中运行程序。" },
+    { question: "Windows 显示安全提示怎么办？", answer: "先核对文件是否来自本页链接的官方发布源，并仔细阅读 Windows 显示的提示。如果无法确认文件来源或安全性，请先不要运行；可以到项目仓库查看发布信息或寻求帮助。" },
+    { question: "下载失败或安装后无法打开怎么办？", answer: "可以重试下载，检查网络、文件是否完整，以及该版本发布说明中的系统要求。如果仍有问题，请记录版本号和完整错误提示，在项目仓库反馈。" },
+  ] : [
+    { question: "Which package should I download?", answer: "For a guided installation, choose an installer (.exe) or MSI package. For a portable package, choose the .zip file. Available files vary by release; check its download list and release notes." },
+    { question: "What should I do with the portable ZIP?", answer: "Extract the entire archive to a folder first, then follow that release's instructions to start the app. Avoid running it directly from the archive preview." },
+    { question: "What if Windows shows a security warning?", answer: "First check that the file came from an official release source linked on this page, and read the Windows message carefully. If you cannot verify its origin or safety, do not run it yet; check the release information or ask for help in the project repository." },
+    { question: "What if the download fails or the app does not open?", answer: "Try downloading again and check your connection, whether the file downloaded completely, and the system requirements in the release notes. If the problem persists, include the version and full error message when reporting it in the project repository." },
+  ];
+  return <section className="dl_faq" aria-labelledby="windows-faq-title">
+    <div className="dl_faqHeading"><p className="dl_overline">{zh ? "安装帮助" : "Installation help"}</p><h2 id="windows-faq-title">{zh ? "Windows 安装常见问题" : "Windows installation FAQ"}</h2><p>{zh ? "安装前后遇到疑问，可以先从这里找找答案。" : "Answers to common questions before and after installation."}</p></div>
+    <div className="dl_faqList">{questions.map(({ question, answer }) => <details className="dl_faqItem" key={question}><summary><span>{question}</span><ChevronDown size={19} aria-hidden="true" /></summary><p>{answer}</p></details>)}</div>
+    <p className="dl_faqHelp">{zh ? "没有找到答案？" : "Still need help?"} <a href="https://github.com/AstraBrew-Labs/AstraBrew-Launcher-Win/issues" target="_blank" rel="noopener noreferrer">{zh ? "前往项目仓库反馈" : "Report an issue in the repository"} <ExternalLink size={14} aria-hidden="true" /></a></p>
+  </section>;
 }
 
-function InstallationFaqSection({ platform }: { platform: ReleasePlatform }) {
-  const { language, t } = useSitePreferences()
-  const items = getInstallationFaqItems(language, platform)
-  const platformLabel = platform === 'windows' ? 'Windows' : 'macOS'
+export function DownloadPage({ locale, region, initialPlatform }: { locale: Locale; region: Region; initialPlatform: "windows" | "mac" | null }) {
+  const zh = locale === "zh";
+  const detectedPlatform = useSyncExternalStore(subscribePlatform, detectPlatform, serverPlatform);
+  const [selectedPlatform, setPlatform] = useState<Platform | null>(initialPlatform);
+  const platform = selectedPlatform ?? detectedPlatform;
+  const { data: result, failed, syncing, refresh } = useReleases(region);
+  const hasError = !result && failed;
+  const degraded = result?.sources.some((source) => source.status !== "ok");
+  const releases = result?.releases ?? [];
+  const source = region === "cn" ? "GitCode" : "GitHub";
 
-  return (
-    <section
-      key={`installation-faq-${platform}`}
-      className="mt-14"
-    >
-      <div className="mb-5 flex items-start gap-3">
-        <div
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: 'oklch(0.74 0.10 212 / 0.12)', border: '1px solid oklch(0.74 0.10 212 / 0.3)' }}
-        >
-          <CircleHelp className="size-5 text-[oklch(0.74_0.10_212)]" />
-        </div>
-        <div>
-          <h2 className="text-xl font-black text-foreground">
-            {t(`${platformLabel} 安装常见问题`, `${platformLabel} installation FAQ`)}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('下载前了解安装包选择、系统安全提示和启动问题。', 'Review package choices, system security prompts, and launch issues before downloading.')}
-          </p>
-        </div>
-      </div>
-
-      <Accordion className="glass-card w-full overflow-hidden rounded-2xl" variant="surface">
-        {items.map((item) => (
-          <Accordion.Item key={item.id} id={item.id}>
-            <Accordion.Heading>
-              <Accordion.Trigger className="text-left font-semibold text-foreground hover:bg-white/3">
-                <span className="min-w-0 flex-1">{item.title}</span>
-                <Accordion.Indicator className="shrink-0 text-muted-foreground [&>svg]:size-4">
-                  <ChevronDown />
-                </Accordion.Indicator>
-              </Accordion.Trigger>
-            </Accordion.Heading>
-            <Accordion.Panel>
-              <Accordion.Body className="pb-5">
-                <HelpContent html={item.content} />
-                {item.tip && <HelpTip type={item.tip.type} text={item.tip.text} />}
-              </Accordion.Body>
-            </Accordion.Panel>
-          </Accordion.Item>
-        ))}
-      </Accordion>
-    </section>
-  )
-}
-
-export default function DownloadPage() {
-  const { language, ready, t, githubProxyEnabled } = useSitePreferences()
-  const [activeOS, setActiveOS] = useState<ReleasePlatform>('windows')
-  const [activeTab, setActiveTab] = useState<TabType>('latest')
-  const [showAll, setShowAll] = useState(false)
-  const [mobile, setMobile] = useState<boolean | null>(null)
-  const {
-    data,
-    error,
-    isLoading,
-    isRefreshing,
-    isUsingFallback,
-    reload,
-  } = useReleases({ enabled: ready && mobile === false, proxyEnabled: githubProxyEnabled })
-
-  useEffect(() => {
-    setMobile(isMobile())
-  }, [])
-
-  useEffect(() => {
-    setShowAll(false)
-  }, [activeOS])
-
-  const currentPlatform = platforms.find((platform) => platform.os === activeOS)!
-  const currentRelease = data?.latest[activeOS] ?? null
-  const currentBetaRelease = data?.latestBeta[activeOS] ?? null
-  const platformReleases = data?.releases[activeOS] ?? []
-  const displayVersions = showAll ? platformReleases : platformReleases.slice(0, 7)
-  const mobileDownloadUrl = siteUrl(localizedPath(language, '/download')).replace(/^https?:\/\//, '')
-
-  if (mobile) {
-    return (
-      <div className="relative flex min-h-[100svh] w-full max-w-full items-center justify-center overflow-x-clip px-4 pt-16 sm:px-6">
-        <div className="absolute inset-0 bg-section-gradient" />
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/4 h-[300px] w-[calc(100vw-2rem)] max-w-[500px] -translate-x-1/2 rounded-full opacity-15 blur-3xl"
-          style={{ background: 'radial-gradient(ellipse, oklch(0.73 0.11 210 / 0.5), transparent 70%)' }}
-        />
-        <div className="relative z-10 w-full min-w-0 max-w-sm text-center">
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{ background: 'oklch(0.74 0.10 212 / 0.12)', border: '1px solid oklch(0.74 0.10 212 / 0.25)' }}
-            >
-              <DeviceMobile weight="fill" className="w-7 h-7 text-[oklch(0.74_0.10_212)]" />
-            </div>
-            <div className="text-muted-foreground text-2xl font-thin select-none">→</div>
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{ background: 'oklch(0.70 0.12 188 / 0.12)', border: '1px solid oklch(0.70 0.12 188 / 0.25)' }}
-            >
-              <Monitor weight="fill" className="w-7 h-7 text-[oklch(0.70_0.12_188)]" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-black mb-3 text-balance">
-            {language === 'zh' ? (
-              <>请在 <span className="text-gradient">桌面端</span> 打开下载</>
-            ) : (
-              <>Open downloads on a <span className="text-gradient">desktop</span></>
-            )}
-          </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed mb-8">
-            {language === 'zh' ? (
-              <>星酿启动器仅支持在 <span className="text-foreground font-medium">Windows</span> 和 <span className="text-foreground font-medium">macOS</span> 上运行。请在电脑浏览器中打开本页面以下载安装包。</>
-            ) : (
-              <>AstraBrew Launcher supports <span className="text-foreground font-medium">Windows</span> and <span className="text-foreground font-medium">macOS</span>. Open this page in a desktop browser to download an installer.</>
-            )}
-          </p>
-
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
-            {platforms.map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-foreground"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <Icon weight="fill" className="w-4 h-4 text-muted-foreground" />
-                {label}
-              </div>
-            ))}
-          </div>
-
-          <p className="flex min-w-0 flex-col items-center gap-2 text-xs text-muted-foreground">
-            <span>{t('在电脑浏览器中访问', 'Visit on your desktop')}</span>
-            <span
-              className="inline-block max-w-full break-all rounded px-2 py-1 font-mono leading-relaxed text-[oklch(0.74_0.10_212)]"
-              style={{ background: 'oklch(0.74 0.10 212 / 0.08)' }}
-            >
-              {mobileDownloadUrl}
-            </span>
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen pt-16 pb-24">
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-section-gradient" />
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] rounded-full opacity-15 blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, oklch(0.73 0.11 210 / 0.5), transparent 70%)' }}
-        />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div>
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5 text-xs font-medium"
-              style={{
-                background: 'oklch(0.74 0.10 212 / 0.1)',
-                border: '1px solid oklch(0.74 0.10 212 / 0.3)',
-                color: 'var(--brand-blue-text)',
-              }}
-            >
-              <CheckCircle weight="fill" className="w-3.5 h-3.5" />
-              {currentRelease
-                ? t(`最新正式版 ${currentRelease.version}`, `Latest stable ${currentRelease.version}`)
-                : t('正在同步最新版本', 'Syncing latest releases')}
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-black mb-4 text-balance">
-              {t('下载', 'Download ')}<span className="text-gradient">{t('星酿启动器', 'AstraBrew Launcher')}</span>
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-              {t(
-                '选择适合你的操作系统，一键下载安装，开启虚拟歌姬创作之旅。',
-                'Choose your operating system and download the latest installer.',
-              )}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {data && error && isUsingFallback && (
-          <Alert status="warning" className="glass-card rounded-xl mb-6">
-            <Alert.Indicator />
-            <Alert.Content>
-              <Alert.Title>{t('正在显示缓存数据', 'Showing cached data')}</Alert.Title>
-              <Alert.Description>
-                {language === 'zh' ? error : 'The release service could not be refreshed. Cached data is shown.'}
-              </Alert.Description>
-            </Alert.Content>
-            <Button
-              isPending={isRefreshing}
-              onPress={() => void reload()}
-              size="sm"
-              variant="outline"
-            >
-              <RefreshCw className="size-4" />
-              {t('重新加载', 'Reload')}
-            </Button>
-          </Alert>
-        )}
-
-        {!data ? (
-          !ready || isLoading ? (
-            <ReleaseLoading />
-          ) : (
-            <ReleaseError
-              message={language === 'zh'
-                ? error ?? '暂时没有可显示的发布数据。'
-                : error
-                  ? 'The release service is unavailable. Check your connection and try again.'
-                  : 'No release data is currently available.'}
-              isRefreshing={isRefreshing}
-              onReload={() => void reload()}
-            />
-          )
-        ) : (
-          <Tabs
-            selectedKey={activeTab}
-            onSelectionChange={(key) => setActiveTab(key as TabType)}
-          >
-            <div className="mb-6 w-fit mx-auto">
-              <Tabs.ListContainer>
-                <Tabs.List
-                  aria-label={t('下载版本', 'Download versions')}
-                  className="flex gap-1 p-1 rounded-xl w-fit"
-                  style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
-                >
-                  {[
-                    { key: 'latest', label: t('最新版本', 'Latest') },
-                    { key: 'all', label: t('所有版本', 'All versions') },
-                  ].map((tab) => (
-                    <Tabs.Tab
-                      key={tab.key}
-                      id={tab.key}
-                      className="relative h-auto w-auto px-5 py-2 rounded-lg text-sm font-medium text-muted-foreground data-[selected=true]:text-white"
-                    >
-                      <span className="relative z-10">{tab.label}</span>
-                      <Tabs.Indicator className="rounded-lg bg-brand-gradient shadow-md" />
-                    </Tabs.Tab>
-                  ))}
-                </Tabs.List>
-              </Tabs.ListContainer>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 mb-5">
-              <div className="flex gap-2">
-                {platforms.map((platform) => {
-                  const Icon = platform.icon
-                  const isActive = activeOS === platform.os
-                  return (
-                    <Button
-                      key={platform.os}
-                      onPress={() => setActiveOS(platform.os)}
-                      variant={isActive ? 'secondary' : 'outline'}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium ${
-                        isActive ? 'text-foreground' : 'glass-card text-muted-foreground hover:text-foreground'
-                      }`}
-                      style={isActive ? {
-                        background: 'oklch(0.74 0.10 212 / 0.15)',
-                        border: '1px solid oklch(0.74 0.10 212 / 0.4)',
-                      } : {}}
-                    >
-                      <Icon weight="fill" className="w-4 h-4" />
-                      {platform.label}
-                    </Button>
-                  )
-                })}
-              </div>
-              <span className="hidden sm:block text-[11px] text-muted-foreground">
-                {isRefreshing
-                  ? t('正在同步…', 'Syncing...')
-                  : t(
-                      `缓存更新于 ${formatReleaseDate(data.fetchedAt, 'zh-CN')}`,
-                      `Cached ${formatReleaseDate(data.fetchedAt, 'en-US')}`,
-                    )}
-              </span>
-            </div>
-
-            <Tabs.Panel id="latest" className="p-0">
-              <div className="space-y-12">
-                <LatestReleaseSection
-                  release={currentRelease}
-                  platform={activeOS}
-                  platformLabel={currentPlatform.label}
-                  requirement={t(currentPlatform.requirement, currentPlatform.requirementEn)}
-                  type="formal"
-                  onReload={() => void reload()}
-                />
-                <LatestReleaseSection
-                  release={currentBetaRelease}
-                  platform={activeOS}
-                  platformLabel={currentPlatform.label}
-                  requirement={t(currentPlatform.requirement, currentPlatform.requirementEn)}
-                  type="beta"
-                  onReload={() => void reload()}
-                />
-              </div>
-            </Tabs.Panel>
-
-            <Tabs.Panel id="all" className="p-0">
-              <div
-                key={`all-${activeOS}`}
-              >
-                <div className="glass-card rounded-2xl overflow-hidden">
-                  <div className="px-5 py-4 border-b border-border/50">
-                    <h3 className="font-bold text-sm text-foreground">{t(`${currentPlatform.label} 历史版本`, `${currentPlatform.label} release history`)}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{t('数据来自官方 GitHub Releases', 'Data from official GitHub Releases')}</p>
-                  </div>
-
-                  {displayVersions.length ? (
-                    <div className="divide-y divide-border/40">
-                      {displayVersions.map((release) => {
-                        const assets = getDownloadAssets(release, activeOS)
-
-                        return (
-                          <div
-                            key={release.id}
-                            className="px-5 py-4 transition-colors hover:bg-white/3"
-                          >
-                            <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                              <div className="flex min-w-0 flex-wrap items-center gap-2.5">
-                                <span className="font-mono text-sm font-bold text-foreground">{release.version}</span>
-                                <span
-                                  className="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                                  style={release.isBeta
-                                    ? { background: 'oklch(0.74 0.10 212 / 0.12)', color: 'var(--brand-blue-text)', border: '1px solid oklch(0.74 0.10 212 / 0.25)' }
-                                    : { background: 'oklch(0.70 0.12 188 / 0.12)', color: 'var(--brand-green-text)', border: '1px solid oklch(0.70 0.12 188 / 0.25)' }}
-                                >
-                                  {release.isBeta ? t('测试版', 'Beta') : t('正式版', 'Stable')}
-                                </span>
-                                {release.title !== release.version && (
-                                  <span className="min-w-0 break-words text-xs text-muted-foreground">{release.title}</span>
-                                )}
-                              </div>
-                              <span className="shrink-0 font-mono text-xs text-muted-foreground">
-                                {formatReleaseDate(release.publishedAt, language === 'zh' ? 'zh-CN' : 'en-US')}
-                              </span>
-                            </div>
-
-                            {assets.length ? (
-                              <div className="mt-3 divide-y divide-border/40 border-t border-border/40">
-                                {assets.map((asset) => (
-                                  <div key={asset.id} className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="flex min-w-0 items-start gap-3">
-                                      <div
-                                        className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg"
-                                        style={{ background: 'oklch(0.74 0.10 212 / 0.12)', border: '1px solid oklch(0.74 0.10 212 / 0.2)' }}
-                                      >
-                                        <FileZip weight="fill" className="size-3.5 text-[oklch(0.74_0.10_212)]" />
-                                      </div>
-                                      <div className="min-w-0">
-                                        <div className="break-all font-mono text-sm font-medium text-foreground">{asset.name}</div>
-                                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                                          <span>{describeReleaseAsset(asset, activeOS, language)}</span>
-                                          <span aria-hidden="true">·</span>
-                                          <span className="font-mono">{formatFileSize(asset.size, language)}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <a
-                                      href={asset.downloadUrl}
-                                      download
-                                      aria-label={t(`下载 ${asset.name}`, `Download ${asset.name}`)}
-                                      className="flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-brand-gradient px-3 py-2 text-xs font-semibold text-white transition-shadow hover:shadow-md sm:w-auto"
-                                    >
-                                      <DownloadSimple weight="bold" className="size-3.5" />
-                                      {t('下载', 'Download')}
-                                    </a>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <a
-                                href={release.htmlUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="mt-3 flex items-center gap-1 border-t border-border/40 pt-3 text-xs font-medium transition-colors"
-                                style={{ color: 'oklch(0.74 0.10 212)' }}
-                              >
-                                {t('该版本暂无安装附件，查看发布页面', 'No installer assets. View release page')}
-                              </a>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <div className="p-5">
-                      <Alert status="warning">
-                        <Alert.Indicator />
-                        <Alert.Content>
-                          <Alert.Title>{t('暂无历史版本', 'No release history')}</Alert.Title>
-                          <Alert.Description>{t('该平台当前没有可显示的 GitHub Release。', 'There are no GitHub Releases available for this platform.')}</Alert.Description>
-                        </Alert.Content>
-                      </Alert>
-                    </div>
-                  )}
-
-                  {platformReleases.length > 7 && (
-                    <Button
-                      fullWidth
-                      onPress={() => setShowAll((value) => !value)}
-                      variant="ghost"
-                      className="w-full flex items-center justify-center gap-2 py-4 text-xs text-muted-foreground hover:text-foreground border-t border-border/40"
-                    >
-                      {showAll ? (
-                        <>{t('收起版本历史', 'Collapse release history')} <ChevronUp className="w-3.5 h-3.5" /></>
-                      ) : (
-                        <>{t('展开全部版本', 'Show all versions')} ({platformReleases.length}) <ChevronDown className="w-3.5 h-3.5" /></>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </Tabs.Panel>
-          </Tabs>
-        )}
-
-        <InstallationFaqSection platform={activeOS} />
-      </div>
+  return <main data-transit-path={`/${locale}/download`} id="main-content" className="dl_page" data-release-region={region}>
+    <PageMotion page="download" platform={platform} />
+    <div className="dl_intro">
+      <p className="dl_kicker">AstraBrew Launcher</p>
+      <h1>{zh ? "下载星酿启动器" : "Download AstraBrew Launcher"}</h1>
+      <p>{zh ? "选择适合你的系统，开始管理 SillyTavern。" : "Choose your platform and get started with SillyTavern."}</p>
     </div>
-  )
+    <div className="dl_sync">
+      <span role="status" data-intro-pending={!result && !failed && platform === "windows" ? true : undefined}>{syncing ? (zh ? "同步版本中…" : "Syncing releases…") : failed ? (result ? (zh ? "同步失败，已保留上次的列表" : "Sync failed · showing saved releases") : (zh ? "暂时无法同步版本" : "Releases unavailable")) : result ? (zh ? "版本列表已同步" : "Release list synced") : (zh ? "准备版本列表" : "Preparing releases")}</span>
+      <button type="button" disabled={syncing} onClick={refresh}>{zh ? "刷新列表" : "Refresh list"}</button>
+    </div>
+    <noscript><a href="https://github.com/AstraBrew-Labs/AstraBrew-Launcher-Win/releases">GitHub Releases ↗</a></noscript>
+    <div className="dl_platformBar" role="group" aria-label={zh ? "选择操作系统" : "Choose operating system"}>
+      <button type="button" className={platform === "windows" ? "is-active" : ""} aria-pressed={platform === "windows"} onClick={() => setPlatform("windows")}><Monitor size={19} aria-hidden="true" /> Windows</button>
+      <button type="button" className={platform === "mac" ? "is-active" : ""} aria-pressed={platform === "mac"} onClick={() => setPlatform("mac")}><Apple size={19} aria-hidden="true" /> macOS</button>
+    </div>
+    {platform === "other" ? <section className="dl_state" aria-live="polite"><Monitor aria-hidden="true" size={27}/><h2>{zh ? "选择你的操作系统" : "Choose your operating system"}</h2><p>{zh ? "请选择 Windows 或 macOS，查看对应版本。" : "Select Windows or macOS to see the available versions."}</p></section>
+      : platform === "mac" ? <section className="dl_state dl_mac" aria-live="polite"><span className="dl_stateIcon"><Apple size={27} aria-hidden="true" /></span><p className="dl_stateLabel">AstraBrew Launcher for macOS</p><h2>{zh ? "Mac 版本尚未发布" : "The Mac version is not yet available"}</h2><p>{zh ? "Mac 版使用 Swift 和 SwiftUI 原生开发，发布后将在这里提供下载。" : "Built natively with Swift and SwiftUI. Downloads will appear here when available."}</p><button type="button" onClick={() => setPlatform("windows")}>{zh ? "查看 Windows 版本" : "See Windows versions"}</button></section>
+      : <section className="dl_versions" aria-live="polite">
+        <div className="dl_sectionHeading"><div><p className="dl_overline">Windows</p><h2>{zh ? "选择一个版本" : "Choose a release"}</h2><p>{zh ? `当前地区优先使用 ${source}，其他来源用于补全。` : `${source} is preferred for your region; the other source fills any gaps.`}</p></div><span className="dl_native">C# + WinUI 3</span></div>
+        {hasError ? <div className="dl_message" role="status"><strong>{zh ? "暂时无法获取版本" : "Versions are temporarily unavailable"}</strong><p>{zh ? "两个发布源目前均无法连接，请稍后重试，或前往仓库查看。" : "Neither release source could be reached. Try again later or visit a repository."}</p><div className="dl_repositoryLinks"><a href="https://github.com/AstraBrew-Labs/AstraBrew-Launcher-Win/releases">GitHub <ExternalLink size={14} aria-hidden="true"/></a><a href="https://gitcode.com/AstraBrew-Labs/AstraBrew-Launcher-Win/releases">GitCode <ExternalLink size={14} aria-hidden="true"/></a></div></div>
+        : degraded && <p className="dl_notice">{zh ? "部分发布源暂时不可用或显示缓存数据，列表可能不完整。" : "Some sources are unavailable or using cached data; the list may be incomplete."}</p>}
+        {result && <ReleaseList releases={releases} locale={locale} uncertain={!!degraded || failed} />}
+        <WindowsFaq locale={locale} />
+      </section>}
+  </main>;
 }
