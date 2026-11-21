@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ProductDemo } from "@/components/product-demo/product-demo";
 import type { Locale } from "@/lib/i18n";
+import { launcherReleaseStatus } from "@/lib/launcher-copy";
 import "./home.css";
 
 type Platform = "windows" | "mac" | "other";
@@ -50,22 +51,22 @@ export function HomeHero({ locale, windowsDownloads }: { locale: Locale; windows
         </Link>
         <Link href={`/${locale}/download`} className="home-action-secondary">{en ? "All versions" : "查看所有版本"}</Link>
       </div>}
-      {platform === "windows" && <p className="home-system-requirement">{en ? "Requires Windows 10 version 1809 or later." : "仅支持 Windows 10 1809 及以上版本。"}</p>}
-      <p className="home-platform-note">{platform === "mac" ? (en ? "macOS is not yet released. Windows releases are available." : "macOS 版尚未发布，可查看 Windows 版本。") : (en ? "Available for Windows. macOS is not yet released." : "Windows 版本可用，macOS 版本尚未发布。")}</p>
+      {platform === "windows" && <p className="home-system-requirement">{en ? "The Windows edition requires Windows 10 version 1809 or later." : "Windows 版需要 Windows 10 1809 或更高版本。"}</p>}
+      <p className="home-platform-note">{launcherReleaseStatus[locale]}</p>
     </div>
     <div className="home-visual">
       <div className="home-orbit" aria-hidden="true" />
       <div className="home-visual-inner">
         <div className="home-platform-switch" role="group" aria-label={en ? "Choose a platform to explore" : "选择展示平台"}>
-          <button type="button" aria-pressed={platform === "windows"} onClick={() => setPlatform("windows")}><Monitor size={15} aria-hidden="true" /> Windows</button>
-          <button type="button" aria-pressed={platform === "mac"} onClick={() => setPlatform("mac")}><Apple size={15} aria-hidden="true" /> macOS</button>
+          <button type="button" className="tab-hover" aria-pressed={platform === "windows"} onClick={() => setPlatform("windows")}><Monitor size={15} aria-hidden="true" /> Windows</button>
+          <button type="button" className="tab-hover" aria-pressed={platform === "mac"} onClick={() => setPlatform("mac")}><Apple size={15} aria-hidden="true" /> macOS</button>
         </div>
         <div ref={platformContent} className="home-platform-content">
         {platform === "windows" ? <ProductDemo locale={locale} /> : platform === "other" ? <div className="home-mac-placeholder">
           <div className="home-mac-symbol"><Monitor aria-hidden="true" size={29} /></div>
           <p className="home-mac-kicker">AstraBrew Launcher</p>
           <h2>{en ? "Choose your platform." : "选择你的平台。"}</h2>
-          <p>{en ? "Explore the Windows interface, or learn about the upcoming macOS edition." : "查看 Windows 版界面，或了解尚未发布的 macOS 版。"}</p>
+          <p>{en ? "Explore the Windows interface or learn about the macOS edition." : "查看 Windows 版界面，或了解尚未发布的 macOS 版。"}</p>
           <button type="button" onClick={() => setPlatform("windows")}>{en ? "Explore Windows" : "查看 Windows 版"}<ArrowUpRight size={16} aria-hidden="true" /></button>
         </div> : <div className="home-mac-placeholder">
           <div className="home-mac-symbol"><Apple aria-hidden="true" size={29} /></div>

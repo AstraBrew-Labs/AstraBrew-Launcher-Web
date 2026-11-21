@@ -5,6 +5,7 @@ import { useState, useSyncExternalStore } from "react";
 import { Apple, ArrowDownToLine, Archive, Box, ChevronDown, ExternalLink, Monitor, PackageCheck } from "lucide-react";
 import { PageMotion } from "@/components/site/page-motion";
 import type { Locale, Region } from "@/lib/i18n";
+import { launcherReleaseStatus } from "@/lib/launcher-copy";
 import { compareReleases, getLatestStableRelease, getReleaseCategory, type AssetKind, type Release, type ReleaseAsset, type ReleaseCategory } from "@/lib/releases";
 import { useReleases } from "@/lib/use-releases";
 import "./download.css";
@@ -131,7 +132,7 @@ export function DownloadPage({ locale, region, initialPlatform }: { locale: Loca
     <div className="dl_intro">
       <p className="dl_kicker">AstraBrew Launcher</p>
       <RouteSeoContent path={`/${locale}/download`}><h1>{zh ? "下载星酿启动器" : "Download AstraBrew Launcher"}</h1></RouteSeoContent>
-      <p>{zh ? "选择适合你的系统，开始管理 SillyTavern。" : "Choose your platform and get started with SillyTavern."}</p>
+      <p>{launcherReleaseStatus[locale]}</p>
     </div>
     <div className="dl_sync">
       <span role="status" data-intro-pending={!result && !failed && platform === "windows" ? true : undefined}>{syncing ? (zh ? "同步版本中…" : "Syncing releases…") : failed ? (result ? (zh ? "同步失败，已保留上次的列表" : "Sync failed · showing saved releases") : (zh ? "暂时无法同步版本" : "Releases unavailable")) : result ? (zh ? "版本列表已同步" : "Release list synced") : (zh ? "准备版本列表" : "Preparing releases")}</span>
@@ -139,10 +140,10 @@ export function DownloadPage({ locale, region, initialPlatform }: { locale: Loca
     </div>
     <noscript><a href="https://github.com/AstraBrew-Labs/AstraBrew-Launcher-Win/releases">GitHub Releases ↗</a></noscript>
     <div className="dl_platformBar" role="group" aria-label={zh ? "选择操作系统" : "Choose operating system"}>
-      <button type="button" className={platform === "windows" ? "is-active" : ""} aria-pressed={platform === "windows"} onClick={() => setPlatform("windows")}><Monitor size={19} aria-hidden="true" /> Windows</button>
-      <button type="button" className={platform === "mac" ? "is-active" : ""} aria-pressed={platform === "mac"} onClick={() => setPlatform("mac")}><Apple size={19} aria-hidden="true" /> macOS</button>
+      <button type="button" className="tab-hover" aria-pressed={platform === "windows"} onClick={() => setPlatform("windows")}><Monitor size={19} aria-hidden="true" /> Windows</button>
+      <button type="button" className="tab-hover" aria-pressed={platform === "mac"} onClick={() => setPlatform("mac")}><Apple size={19} aria-hidden="true" /> macOS</button>
     </div>
-    {platform === "other" ? <section className="dl_state" aria-live="polite"><Monitor aria-hidden="true" size={27}/><h2>{zh ? "选择你的操作系统" : "Choose your operating system"}</h2><p>{zh ? "请选择 Windows 或 macOS，查看对应版本。" : "Select Windows or macOS to see the available versions."}</p></section>
+    {platform === "other" ? <section className="dl_state" aria-live="polite"><Monitor aria-hidden="true" size={27}/><h2>{zh ? "选择你的操作系统" : "Choose your operating system"}</h2><p>{zh ? "选择 Windows 查看安装包，或选择 macOS 了解版本信息。" : "Choose Windows to browse installers or macOS for edition details."}</p></section>
       : platform === "mac" ? <section className="dl_state dl_mac" aria-live="polite"><span className="dl_stateIcon"><Apple size={27} aria-hidden="true" /></span><p className="dl_stateLabel">AstraBrew Launcher for macOS</p><h2>{zh ? "Mac 版本尚未发布" : "The Mac version is not yet available"}</h2><p>{zh ? "Mac 版使用 Swift 和 SwiftUI 原生开发，发布后将在这里提供下载。" : "Built natively with Swift and SwiftUI. Downloads will appear here when available."}</p><button type="button" onClick={() => setPlatform("windows")}>{zh ? "查看 Windows 版本" : "See Windows versions"}</button></section>
       : <section className="dl_versions" aria-live="polite">
         <div className="dl_sectionHeading"><div><p className="dl_overline">Windows</p><h2>{zh ? "选择一个版本" : "Choose a release"}</h2><p>{zh ? `当前地区优先使用 ${source}，其他来源用于补全。` : `${source} is preferred for your region; the other source fills any gaps.`}</p></div><span className="dl_native">C# + WinUI 3</span></div>

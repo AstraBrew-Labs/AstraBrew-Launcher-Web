@@ -35,7 +35,7 @@ export function WorkspaceShowcase({ locale }: { locale: Locale }) {
       <div className="home-workspace-heading"><div><p className="home-section-label">{en ? "A workspace for your tavern" : "你的酒馆工作台"}</p><h2 id="workspace-title">{en ? <>Everything has<br />its place.</> : <>每件事，<br />都有它的位置。</>}</h2></div><p>{en ? "From the first setup to everyday management, find the essentials in one place." : "从第一次配置，到之后的日常管理，把需要的事放在同一个地方。"}</p></div>
       <div className="home-workspace-grid">
         <div className="home-workspace-copy">
-          <div className="home-workspace-tabs" role="group" aria-label={en ? "Explore workspace features" : "查看工作台功能"}>{items.map((item, index) => { const Icon = icons[index]; return <button type="button" key={item.title} aria-pressed={active === index} onClick={() => setActive(index)}><Icon size={18} aria-hidden="true" /><span>{item.title}</span><span className="home-workspace-tab-arrow" aria-hidden="true">↗</span></button>; })}</div>
+          <div className="home-workspace-tabs" role="group" aria-label={en ? "Explore workspace features" : "查看工作台功能"}>{items.map((item, index) => { const Icon = icons[index]; return <button type="button" className="tab-hover" key={item.title} aria-pressed={active === index} onClick={() => setActive(index)}><Icon size={18} aria-hidden="true" /><span>{item.title}</span><span className="home-workspace-tab-arrow" aria-hidden="true">↗</span></button>; })}</div>
           <div className="home-workspace-detail" aria-live="polite"><h3>{current.heading}</h3><p>{current.description}</p></div>
         </div>
         <div className="home-workspace-art" aria-label={en ? "Illustration of workspace features" : "工作台功能示意图"}>

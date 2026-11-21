@@ -11,6 +11,7 @@ import { isLocale } from "@/lib/i18n";
 import { DocumentBootstrap } from "@/components/site/document-bootstrap";
 import "../globals.css";
 import "../theme.css";
+import "../interaction-feedback.css";
 
 async function RegionHint() { return <span hidden data-request-region={await requestRegion()} />; }
 

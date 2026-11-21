@@ -12,7 +12,7 @@
   --color-fd-card: var(--astra-cloud); --color-fd-card-foreground: var(--astra-ink);
   --color-fd-border: var(--astra-line); --color-fd-primary: var(--astra-blue-text);
   --color-fd-primary-foreground: var(--astra-white); --color-fd-secondary: var(--astra-cloud);
-  --color-fd-secondary-foreground: var(--astra-ink); --color-fd-accent: var(--astra-blue-soft);
+  --color-fd-secondary-foreground: var(--astra-ink); --color-fd-accent: var(--interaction-hover);
   --color-fd-accent-foreground: var(--astra-blue-text); --color-fd-ring: var(--focus-ring);
 }
 #nd-docs-layout { background: var(--color-fd-background); border-block: 1px solid var(--color-fd-border); }
@@ -20,3 +20,70 @@
 .guide-loading i { display: block; height: .85rem; width: 88%; margin-bottom: .8rem; border-radius: 6px; background: var(--astra-line); }
 .guide-loading i:first-child { width: 42%; height: 2rem; margin-bottom: 1.5rem; }
 .guide-loading i:last-child { width: 65%; }
+
+/* Desktop sidebar and its mobile drawer share the same rows and selection. */
+:is(#nd-sidebar, #nd-sidebar-mobile) :is(a[data-active], button[aria-expanded]:not([aria-controls="nd-sidebar-mobile"])) {
+  min-block-size: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+:is(#nd-sidebar, #nd-sidebar-mobile) a[data-active="true"] {
+  background-color: var(--interaction-selected);
+  color: var(--interaction-selected-text);
+  box-shadow: none;
+  transition: none;
+}
+
+/* The filled row replaces Fumadocs’ optional nested-page indicator. */
+:is(#nd-sidebar, #nd-sidebar-mobile) a[data-active="true"]::before { content: none; }
+
+:is(#nd-toc, [data-toc-popover]) a[data-active] {
+  min-block-size: 34px;
+  display: block;
+  padding-block: 7px;
+  padding-inline-end: 8px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+:is(#nd-toc, [data-toc-popover]) a[data-active="true"] { font-weight: 700; }
+
+:is(#nd-sidebar, #nd-sidebar-mobile, #nd-subnav) :is(a[data-active="false"], button[aria-expanded], button[aria-controls]),
+:is(#nd-toc, [data-toc-popover]) a[data-active],
+[data-toc-popover-trigger] {
+  transition: background-color var(--interaction-time) var(--ease-out),
+    color var(--interaction-time) var(--ease-out), box-shadow var(--interaction-time) var(--ease-out);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--interaction-hover);
+      box-shadow: inset 0 0 0 1px var(--interaction-edge);
+    }
+  }
+}
+
+:is(#nd-sidebar, #nd-sidebar-mobile, #nd-subnav, #nd-toc, [data-toc-popover]) :is(a, button):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -3px;
+}
+
+:is(#nd-sidebar, #nd-sidebar-mobile) a[data-active="true"]:focus-visible {
+  outline-color: var(--interaction-selected-text);
+}
+
+@media (forced-colors: active) {
+  :is(#nd-sidebar, #nd-sidebar-mobile, #nd-toc, [data-toc-popover]) a[data-active="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  :is(#nd-sidebar, #nd-sidebar-mobile, #nd-toc, [data-toc-popover]) a[data-active="true"]:focus-visible {
+    outline-color: HighlightText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-toc-list > div:first-child { transition: none; }
+}

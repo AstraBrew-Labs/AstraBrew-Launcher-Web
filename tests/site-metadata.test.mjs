@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import {
-  languageAlternates, launcherStructuredData, localizedMetadata, shareImagePath,
+  formatSiteTitle, languageAlternates, launcherStructuredData, localizedMetadata, shareImagePath,
   siteMetadata, siteOrigin, sitePagePaths, sitePages,
 } from '../lib/site-metadata.ts';
 
@@ -24,6 +24,35 @@ afterEach(() => {
 });
 
 describe('site SEO', () => {
+  test('restored homepage titles do not change the titles of other pages', () => {
+    const titles = {
+      zh: { home: '星酿启动器 (AstraBrew Launcher) · 简单易用的 SillyTavern 酒馆启动器', suffix: '星酿启动器｜SillyTavern 酒馆启动与管理工具', download: 'Windows 版下载', license: 'Apache 2.0 开源协议', about: '关于我们', changelog: '更新日志' },
+      en: { home: 'AstraBrew Launcher (星酿启动器) · A simpler way to run SillyTavern', suffix: 'AstraBrew Launcher — SillyTavern Launcher', download: 'Download for Windows', license: 'Apache 2.0 License', about: 'About AstraBrew Labs', changelog: 'Website Changelog' },
+    };
+    for (const [locale, labels] of Object.entries(titles)) {
+      for (const page of sitePages) {
+        const metadata = siteMetadata(locale, page);
+        const expected = page === 'home' ? labels.home : `${labels[page]} | ${labels.suffix}`;
+        expect(metadata.title).toBe(expected);
+        expect(metadata.openGraph.title).toBe(expected);
+        expect(metadata.twitter.title).toBe(expected);
+      }
+      const preview = locale === 'zh' ? '设计预览' : 'Design preview';
+      expect(formatSiteTitle(locale, preview)).toBe(`${preview} | ${labels.suffix}`);
+    }
+  });
+
+  test('home descriptions distinguish available and unreleased editions', () => {
+    const zh = siteMetadata('zh', 'home');
+    const en = siteMetadata('en', 'home');
+    expect(zh.description).toContain('Windows 版现已发布，macOS 版尚未发布');
+    expect(en.description).toContain('The Windows edition is available now. The macOS edition has not yet been released.');
+    for (const metadata of [zh, en]) {
+      expect(metadata.openGraph.description).toBe(metadata.description);
+      expect(metadata.twitter.description).toBe(metadata.description);
+    }
+  });
+
   test('canonical, mutual alternates, and OG URLs agree for each public section', () => {
     expect(sitePagePaths('home')).toEqual({ zh: '/zh', en: '/en' });
     for (const page of sitePages) {
@@ -47,6 +76,9 @@ describe('site SEO', () => {
     const meta = localizedMetadata({
       locale: 'zh', section: 'docs', paths: { zh: '/zh/docs/topic' }, title: 'Topic', description: 'A help topic.',
     });
+    expect(meta.title).toBe('Topic | 星酿启动器｜SillyTavern 酒馆启动与管理工具');
+    expect(meta.openGraph.title).toBe(meta.title);
+    expect(meta.twitter.title).toBe(meta.title);
     expect(meta.alternates.canonical).toBe(`${origin}/zh/docs/topic`);
     expect(meta.alternates.languages).toBeUndefined();
     expect(meta.openGraph.alternateLocale).toEqual([]);

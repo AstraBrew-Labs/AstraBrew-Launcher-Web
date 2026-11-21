@@ -1,9 +1,10 @@
 # AstraBrew Launcher
 
-> An open-source Windows launcher that sets up and starts SillyTavern. This site provides downloads, installation guides, and license information.
+> A desktop launcher for setting up, starting, and managing SillyTavern. The Windows edition is available now. The macOS edition has not yet been released. This site provides downloads, installation guides, and license information.
 
 ## User guide
 
+- [About us](https://launcher.astrabrew.cn/en/about): Who builds AstraBrew Launcher and how to contribute feedback.
 - [User guide](https://launcher.astrabrew.cn/en/docs): Product overview and where to start.
 - [Installation](https://launcher.astrabrew.cn/en/docs/installation): Windows setup and first launch.
 - [Downloads](https://launcher.astrabrew.cn/en/download): Releases and available platforms.
@@ -11,6 +12,7 @@
 
 ## 中文文档
 
+- [关于我们](https://launcher.astrabrew.cn/zh/about)：了解星酿启动器的开发团队与反馈渠道。
 - [使用文档](https://launcher.astrabrew.cn/zh/docs): 启动器简介与使用入口。
 - [安装指南](https://launcher.astrabrew.cn/zh/docs/installation): Windows 安装和首次启动。
 - [下载中心](https://launcher.astrabrew.cn/zh/download): 发行版本与平台支持。

@@ -3,6 +3,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import { docsSource } from '@/lib/docs';
 import { isLocale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
+import { BackToTop } from '@/components/site/back-to-top';
 import { PageMotion } from '@/components/site/page-motion';
 import './docs.css';
 
@@ -20,5 +21,6 @@ export default async function UserGuideLayout({ children, params }: LayoutProps<
       <PageMotion page="docs" />
       {children}
     </DocsLayout>
+    <BackToTop locale={lang} />
   </RootProvider>;
 }

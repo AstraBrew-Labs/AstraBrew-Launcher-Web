@@ -13,6 +13,8 @@ const entries = {
   download: { copy: ".dl_kicker, .dl_intro > p:last-child", surface: ".dl_sync, .dl_platformBar" },
   license: { copy: ".license-kicker", surface: ".license-filebar, .license-overview" },
   preview: { copy: ".pv_name, .pv_copy > p:first-of-type", surface: ".pv_actions, .pv_platform", visual: ".pv_visual" },
+  about: { copy: ".about-eyebrow, .about-lead", surface: ".about-mission, .about-card", visual: ".about-art" },
+  changelog: { copy: ".changelog-kicker, .changelog-lead", surface: ".changelog-index-link" },
   docs: { copy: "[data-docs-description]", surface: "[data-docs-body] > :first-child" },
   message: { copy: ":scope > p", surface: ":scope > a, :scope > button" },
 } satisfies Record<string, { copy: string; surface: string; visual?: string }>;

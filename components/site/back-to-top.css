@@ -1,0 +1,33 @@
+.back-to-top-position {
+  --back-to-top-gap: clamp(16px, 3vw, 32px);
+  position: fixed;
+  z-index: 10;
+  right: calc(var(--back-to-top-gap) + env(safe-area-inset-right, 0px));
+  bottom: calc(clamp(48px, 8svh, 76px) + env(safe-area-inset-bottom, 0px));
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out),
+    visibility 0s linear;
+}
+.back-to-top-position[data-tooltip-inactive] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition-delay: 0s, 0s, 180ms;
+}
+.back-to-top {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--astra-line-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--astra-blue-text);
+  box-shadow: var(--shadow-card);
+}
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top-position, .back-to-top-position[data-tooltip-inactive], .back-to-top { transition: none; transform: none; }
+}

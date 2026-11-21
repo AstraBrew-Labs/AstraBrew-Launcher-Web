@@ -1,0 +1,2 @@
+.site-changelog{position:relative;display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--astra-line-strong);border-radius:50%;background:var(--surface);color:var(--astra-stone)}
+@media(max-width:380px){.site-logo img{width:112px}.site-actions{gap:6px}.site-header .site-language{width:44px;padding:0}.site-language-label{display:none}}

@@ -1,17 +1,22 @@
 "use client";
 
 import { ThemeToggle } from "./theme-toggle";
+import { IconTooltip } from "./icon-tooltip";
+import "./site-header-actions.css";
 import { Globe2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ActiveChangelogLink, ChangelogLink, SiteNavigation, SiteNavLinks } from "./site-navigation";
 import { navigateWithTransition } from "@/components/site/route-transition";
+import { launcherLockup, launcherLockupSize } from "@/lib/launcher-brand";
 import { isLocale, LOCALE_COOKIE, LOCALE_STORAGE_KEY, localizedPath, REGION_COOKIE, regionFromBrowser, saveBrowserRegion, saveLocalePreference, type Locale } from "@/lib/i18n";
 
 export function SiteHeader({ locale }: { locale: Locale }) {
   const en = locale === "en";
   const router = useRouter();
+  const languageHint = en ? "Switch to Chinese" : "切换到英文";
   useEffect(() => {
     const cookies = document.cookie.split("; ").map((part) => part.split("="));
     if (!cookies.some(([key]) => key === LOCALE_COOKIE)) {
@@ -35,13 +40,17 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     navigateWithTransition(href, () => router.push(href, { scroll: false }), () => router.prefetch(href));
   }
   return <header className="site-header"><div className="site-header-inner">
-    <Link href={`/${locale}`} className="site-logo" aria-label={en ? "AstraBrew Launcher home" : "星酿启动器首页"}><Image src="/brand/launcher-lockup-color.svg" alt="" width={166} height={44} priority /></Link>
-    <nav className="site-nav" aria-label={en ? "Main navigation" : "主导航"}>
-      <Link href={`/${locale}`}>{en ? "Features" : "产品介绍"}</Link>
-      <Link href={`/${locale}/download`}>{en ? "Downloads" : "版本下载"}</Link>
-      <Link href={`/${locale}/docs`} prefetch={false}>{en ? "User guide" : "使用文档"}</Link>
-      <Link href={`/${locale}/license`}>{en ? "License" : "开源协议"}</Link>
-    </nav>
-    <div className="site-actions"><button type="button" className="site-language" aria-label={en ? "中文 — Switch to Chinese" : "EN — 切换到英文"} onClick={switchLanguage}><Globe2 size={17} aria-hidden="true" /><span className="site-language-label">{en ? "中文" : "EN"}</span></button><Link className="site-header-cta" href={`/${locale}/download`}>{en ? "Get Launcher" : "获取启动器"}</Link><ThemeToggle locale={locale} /></div>
+    <Link href={`/${locale}`} className="site-logo" aria-label={en ? "AstraBrew Launcher home" : "星酿启动器首页"}><Image src={launcherLockup[locale].src} alt="" {...launcherLockupSize} priority /></Link>
+    <Suspense fallback={<SiteNavLinks locale={locale} />}><SiteNavigation locale={locale} /></Suspense>
+    <div className="site-actions">
+      <Suspense fallback={<ChangelogLink locale={locale} />}><ActiveChangelogLink locale={locale} /></Suspense>
+      <IconTooltip label={languageHint}>
+        <button type="button" className="site-language" aria-label={`${en ? "中文" : "EN"} — ${languageHint}`} onClick={switchLanguage}>
+          <Globe2 size={17} aria-hidden="true" /><span className="site-language-label">{en ? "中文" : "EN"}</span>
+        </button>
+      </IconTooltip>
+      <Link className="site-header-cta" href={`/${locale}/download`}>{en ? "Get Launcher" : "获取启动器"}</Link>
+      <ThemeToggle locale={locale} />
+    </div>
   </div></header>;
 }

@@ -1,4 +1,4 @@
-// Regenerate the static share cards with: CHROME_BIN=/path/to/chrome bun scripts/render-og.mjs
+// Regenerate the static share cards with: CHROME_BIN=/path/to/chrome bun scripts/render-og.mjs [section]
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -19,8 +19,8 @@ const chinese = data('fonts/ZCOOLKuaiLe-subset.woff2', 'font/woff2');
 // [section marker, headline lines, supporting line, small platform/action cue]
 const cards = {
   home: {
-    zh: ['产品介绍', ['星酿启动器'], '一站式启动与管理 SillyTavern', 'Windows 版'],
-    en: ['THE LAUNCHER', ['AstraBrew', 'Launcher'], 'Set up and manage SillyTavern', 'FOR WINDOWS'],
+    zh: ['产品介绍', ['星酿启动器'], '一站式启动与管理 SillyTavern', '桌面启动器'],
+    en: ['THE LAUNCHER', ['AstraBrew', 'Launcher'], 'Set up and manage SillyTavern', 'DESKTOP LAUNCHER'],
   },
   download: {
     zh: ['版本下载', ['下载 Windows 版'], '稳定版、测试版与历史版本', 'Windows 安装包'],
@@ -29,6 +29,10 @@ const cards = {
   license: {
     zh: ['开源协议', ['Apache 2.0', '开源协议'], '查看权限、条件与限制', 'Windows 版'],
     en: ['OPEN SOURCE', ['Apache 2.0', 'License'], 'Permissions, conditions, and limitations', 'WINDOWS EDITION'],
+  },
+  about: {
+    zh: ['关于我们', ['关于星酿'], '让酒馆更简单', 'ASTRABREW LABS'],
+    en: ['ABOUT US', ['AstraBrew', 'Labs'], 'A simpler start for your tavern', 'MEET THE PROJECT'],
   },
   docs: {
     zh: ['使用文档', ['星酿使用文档'], '从安装启动器，到打开你的酒馆', 'Windows 使用指南'],
@@ -40,6 +44,7 @@ const artwork = {
   home: '<path d="M10 16l5 5-5 5m9 0h9"/>',
   download: '<path d="M21 12v15m-6-6 6 6 6-6m-15 8v5h18v-5"/>',
   license: '<path d="M21 12v18m-7 3h14M10 16h22m-19 0-4 8h8zm16 0-4 8h8z"/>',
+  about: '<path d="M21 11c2 6 4 8 10 10-6 2-8 4-10 10-2-6-4-8-10-10 6-2 8-4 10-10Z"/>',
   docs: '<path d="M21 15c-4-3-8-3-12-2v16c4-1 8-1 12 2 4-3 8-3 12-2V13c-4-1-8-1-12 2zm0 0v16"/>',
 };
 
@@ -89,10 +94,14 @@ function cardHtml(section, locale, [sectionName, lines, subtitle, cue]) {
   </div></html>`;
 }
 
+const selected = process.argv[2];
+if (selected && !Object.hasOwn(cards, selected)) throw new Error(`Unknown share card section: ${selected}`);
+
 const scratch = mkdtempSync(join(tmpdir(), 'astrabrew-og-'));
 mkdirSync(outputDir, { recursive: true });
 try {
   for (const [section, languages] of Object.entries(cards)) {
+    if (selected && selected !== section) continue;
     for (const [locale, copy] of Object.entries(languages)) {
       const html = join(scratch, 'card.html');
       const result = join(scratch, 'card.png');

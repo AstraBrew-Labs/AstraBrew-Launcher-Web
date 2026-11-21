@@ -1,0 +1,64 @@
+:where(.icon-tooltip) {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.icon-tooltip-popup {
+  --tooltip-fade: 110ms;
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 100%;
+  left: 50%;
+  translate: -50% 0;
+  padding-block-start: 7px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  visibility: hidden;
+  opacity: 0;
+}
+
+.icon-tooltip-label {
+  display: block;
+  border: 1px solid var(--astra-line-strong);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--shadow-card-hover);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.icon-tooltip[data-placement="below-end"] > .icon-tooltip-popup {
+  left: auto;
+  right: 0;
+  translate: none;
+}
+
+.icon-tooltip[data-placement="left"] > .icon-tooltip-popup {
+  inset: 50% 100% auto auto;
+  translate: 0 -50%;
+  padding: 0 8px 0 0;
+}
+
+/* Padding makes the gap hoverable without expanding the button's hit area. */
+@media (hover: hover) and (pointer: fine) {
+  .icon-tooltip:not([data-tooltip-inactive], [data-dismissed]):hover > .icon-tooltip-popup {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 190ms, opacity var(--tooltip-fade) var(--ease-out) 190ms;
+  }
+}
+
+.icon-tooltip:not([data-tooltip-inactive], [data-dismissed]):has(> :focus-visible) > .icon-tooltip-popup {
+  visibility: visible;
+  opacity: 1;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-tooltip-popup { --tooltip-fade: 0s; }
+}

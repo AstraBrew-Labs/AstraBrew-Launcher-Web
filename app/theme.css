@@ -32,7 +32,6 @@ html[data-theme="dark"] {
   border: 1px solid var(--astra-line-strong); border-radius: 50%;
   background: var(--astra-white); color: var(--astra-blue-text);
 }
-.site-theme-toggle:hover { background: var(--astra-blue-soft); }
 .site-theme-toggle svg { grid-area: 1 / 1; }
 .theme-sun, [data-theme="dark"] .theme-moon { opacity: 0; transform: rotate(-45deg) scale(.6); }
 [data-theme="dark"] .theme-sun { opacity: 1; transform: none; }

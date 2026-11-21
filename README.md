@@ -33,6 +33,10 @@ bun run dev
 - 新增主题时，使用相同的 slug 创建 `主题.mdx` 和 `主题.en.mdx`，在 frontmatter 中写 `title` 和 `description`，并在 `meta.json` 设置导航顺序。
 - 正文的二级、三级标题会生成页内目录。运行 `bun run dev` 预览；`bun run build` 会重新生成内容索引并检查页面。
 
+## 网站更新日志
+
+`/zh/changelog` 和 `/en/changelog` 展示官网更新，不是客户端发行记录。新增条目时在 `app/[lang]/changelog/entries.ts` 补充日期、唯一 ID、中英文标题与说明，最新条目放在最前面。
+
 ## 搜索索引与分享卡片
 
 | 可索引栏目 | 中文 | English |
@@ -40,6 +44,7 @@ bun run dev
 | 产品首页 | `/zh` | `/en` |
 | Windows 版下载 | `/zh/download` | `/en/download` |
 | Windows 版开源协议 | `/zh/license` | `/en/license` |
+| 网站更新日志 | `/zh/changelog` | `/en/changelog` |
 | 快速开始 | `/zh/docs` | `/en/docs` |
 | 下载与安装 | `/zh/docs/installation` | `/en/docs/installation` |
 

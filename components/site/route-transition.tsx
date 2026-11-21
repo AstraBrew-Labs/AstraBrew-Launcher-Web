@@ -12,8 +12,9 @@ import "./transit.css";
 
 const sectors = {
   home: ["01", "启动中心", "Launch Center"], download: ["02", "版本下载", "Downloads"],
-  docs: ["05", "使用文档", "User Guide"],
+  docs: ["05", "使用文档", "User Guide"], about: ["06", "关于我们", "About Us"],
   license: ["03", "开源协议", "License"], preview: ["04", "界面预览", "Preview"],
+  changelog: ["07", "更新日志", "Changelog"],
 } as const;
 let cancelTransit: (() => void) | undefined;
 

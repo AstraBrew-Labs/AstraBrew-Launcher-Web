@@ -1,0 +1,139 @@
+.site-header {
+  --nav-hover-surface: var(--interaction-hover);
+  --nav-hover-border: var(--interaction-edge);
+}
+
+.site-nav {
+  --nav-pill-height: 36px;
+  --nav-pill-inset: 2px;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+
+.site-nav-link {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: var(--radius-pill);
+  color: var(--astra-stone);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 120ms var(--ease-out);
+}
+
+.site-nav-hover {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: var(--nav-pill-inset);
+  width: calc(var(--nav-hover-width, 0px) - 2 * var(--nav-pill-inset));
+  height: var(--nav-pill-height);
+  transform: translate(var(--nav-hover-x, 0px), -50%);
+  border: 1px solid var(--nav-hover-border);
+  border-radius: var(--radius-pill);
+  background: var(--nav-hover-surface);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 135ms var(--ease-out);
+}
+
+.site-nav-hover[data-glide] {
+  transition: opacity 135ms var(--ease-out), transform 230ms cubic-bezier(.22,.8,.22,1),
+    width 230ms cubic-bezier(.22,.8,.22,1);
+}
+
+/* Keep the larger hit area, but use the same visual footprint as the hover pill. */
+.site-nav-link::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  inset-inline: var(--nav-pill-inset);
+  height: var(--nav-pill-height);
+  transform: translateY(-50%);
+  border: 1px solid var(--nav-pill-edge, transparent);
+  border-radius: inherit;
+  background-color: var(--nav-pill-fill, transparent);
+  pointer-events: none;
+}
+
+.site-nav-link[aria-current] {
+  --nav-pill-fill: var(--interaction-selected);
+  color: var(--interaction-selected-text);
+  transition: none;
+}
+
+.site-header .site-changelog[aria-current] {
+  color: var(--interaction-selected-text);
+  background: var(--interaction-selected);
+  border-color: transparent;
+  transition: none;
+}
+
+.site-nav-link:focus-visible { outline-offset: 0; }
+
+.site-nav-link:not([aria-current]):focus-visible {
+  --nav-pill-fill: var(--nav-hover-surface);
+  --nav-pill-edge: var(--nav-hover-border);
+  color: var(--astra-ink);
+}
+
+@media (any-hover: hover) and (any-pointer: fine) {
+  .site-nav-hover[data-visible] { opacity: 1; }
+  .site-nav-link:not([aria-current]):hover { color: var(--astra-ink); }
+  /* Keep a lightweight hover cue even before hydration. */
+  .site-nav:not(:has(.site-nav-hover[data-visible])) .site-nav-link:not([aria-current]):hover {
+    --nav-pill-fill: var(--nav-hover-surface);
+    --nav-pill-edge: var(--nav-hover-border);
+  }
+  .site-header :is(.site-changelog:not([aria-current]), .site-language, .site-theme-toggle, .site-header-cta):hover {
+    background-color: var(--nav-hover-surface);
+    color: var(--astra-ink);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+@media (forced-colors: active) {
+  .site-nav-link[aria-current], .site-header .site-changelog[aria-current] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+
+  .site-nav-link[aria-current] { --nav-pill-fill: Highlight; }
+
+  .site-header .site-changelog[aria-current] {
+    background: Highlight;
+    border-color: Highlight;
+  }
+
+  .site-nav-link[aria-current]:focus-visible, .site-header .site-changelog[aria-current]:focus-visible {
+    outline-color: CanvasText;
+  }
+}
+
+@media (max-width: 1200px) {
+  .site-nav {
+    order: 3;
+    width: 100%;
+    gap: 3px;
+    margin: 0 -8px;
+    padding: 5px;
+    overflow-x: auto;
+    scroll-padding-inline: 5px;
+  }
+  .site-nav-link { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-link, .site-nav-hover, .site-nav-hover[data-glide] { transition: none; }
+}

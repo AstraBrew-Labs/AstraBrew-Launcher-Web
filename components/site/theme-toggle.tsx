@@ -1,6 +1,7 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { IconTooltip } from "./icon-tooltip";
 import { useLayoutEffect, useSyncExternalStore } from "react";
 import type { Locale } from "@/lib/i18n";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
@@ -60,11 +61,12 @@ export function ThemeToggle({ locale }: { locale: Locale }) {
     } catch { /* Keep the current in-memory selection. */ }
   }, [locale]);
   const en = locale === "en";
-  return <button type="button" className="site-theme-toggle" aria-pressed={dark}
-    aria-label={en ? "Dark theme" : "暗色主题"}
-    title={dark ? (en ? "Switch to light theme" : "切换到亮色主题") : (en ? "Switch to dark theme" : "切换到暗色主题")}
-    onClick={event => toggle(event.currentTarget)}>
-    <Moon className="theme-moon" size={19} aria-hidden="true" />
-    <Sun className="theme-sun" size={19} aria-hidden="true" />
-  </button>;
+  const hint = dark ? (en ? "Switch to light theme" : "切换到亮色主题") : (en ? "Switch to dark theme" : "切换到暗色主题");
+  return <IconTooltip label={hint} placement="below-end">
+    <button type="button" className="site-theme-toggle" aria-pressed={dark}
+      aria-label={en ? "Dark theme" : "暗色主题"} onClick={event => toggle(event.currentTarget)}>
+      <Moon className="theme-moon" size={19} aria-hidden="true" />
+      <Sun className="theme-sun" size={19} aria-hidden="true" />
+    </button>
+  </IconTooltip>;
 }

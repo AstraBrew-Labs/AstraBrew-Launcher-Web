@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props) {
     locale: lang,
     paths: docsPagePaths(page.slugs),
     section: 'docs',
-    title: `${page.data.title} | ${lang === 'zh' ? '星酿启动器使用文档' : 'AstraBrew Launcher User Guide'}`,
+    title: lang === 'zh' ? `使用文档：${page.data.title}` : `User Guide: ${page.data.title}`,
     description: page.data.description ?? page.data.title,
   });
 }
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: Props) {
 export default async function GuidePage({ params }: Props) {
   const { page } = await resolvePage(params);
   const Content = page.data.body;
-  return <DocsPage toc={page.data.toc} data-transit-path={page.url}>
+  return <DocsPage toc={page.data.toc} tableOfContent={{ style: "block", list: { className: "guide-toc-list" } }}
+    tableOfContentPopover={{ style: "block", list: { className: "guide-toc-list" } }} data-transit-path={page.url}>
     <RouteSeoContent path={page.url}><DocsTitle id="main-content">{page.data.title}</DocsTitle></RouteSeoContent>
     <DocsDescription data-docs-description>{page.data.description}</DocsDescription>
     <DocsBody data-docs-body><Content components={defaultMdxComponents} /></DocsBody>

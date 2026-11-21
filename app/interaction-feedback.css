@@ -1,0 +1,78 @@
+:root {
+  --interaction-hover: color-mix(in srgb, var(--surface), var(--astra-blue-text) 11%);
+  --interaction-edge: color-mix(in srgb, transparent, var(--astra-blue-text) 22%);
+  --interaction-selected: var(--astra-blue-text);
+  --interaction-selected-text: var(--astra-cloud);
+  --interaction-time: 150ms;
+}
+
+.tab-hover {
+  background-color: var(--tab-rest, transparent);
+  color: var(--tab-ink, var(--foreground));
+}
+
+.tab-hover[aria-pressed="true"] {
+  background-color: var(--interaction-selected);
+  border-color: var(--interaction-selected);
+  color: var(--interaction-selected-text);
+}
+
+/* Text actions have an inset highlight; inline links use a small, wrapping tint. */
+:is(.home-platform-cards a, .home-open-source a, .about-action, .about-card-links a,
+  .dl_releaseLink, .dl_repositoryLinks a, .dl_faqHelp a, .changelog-index-link, .changelog-end a,
+  .license-filebar a, .license-note a) {
+  border-radius: var(--radius-sm);
+  padding-inline: 10px;
+  text-decoration: none;
+}
+
+:is(.home-download-meta a, .home-guide-link, .about-lead a, .about-mission p a,
+  [data-docs-body] :where(p, li, td) a:not(:where(.not-prose, .not-prose *))) {
+  padding: .08em .24em;
+  border-radius: .3em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background-color: var(--astra-blue-soft);
+  color: var(--astra-blue-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+:is(.tab-hover:not([aria-pressed="true"]),
+  .site-footer-links a, .home-platform-cards a, .home-open-source a, .about-action, .about-card-links a,
+  .dl_releaseLink, .dl_repositoryLinks a, .dl_faqHelp a, .changelog-index-link, .changelog-end a,
+  .license-filebar a, .license-note a, .license-toc a,
+  .home-download-meta a, .home-guide-link, .about-lead a, .about-mission p a,
+  [data-docs-body] :where(p, li, td) a:not(:where(.not-prose, .not-prose *)),
+  .dl_asset, .dl_release > summary, .dl_faqItem > summary, .dl_moreReleases > summary,
+  .dl_sync button:not(:disabled), .home-mac-placeholder button:not(:disabled), .back-to-top) {
+  transition: background-color var(--interaction-time) var(--ease-out),
+    color var(--interaction-time) var(--ease-out), box-shadow var(--interaction-time) var(--ease-out);
+
+  &:focus-visible {
+    background-color: var(--interaction-hover);
+    color: var(--astra-ink);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--interaction-hover);
+      color: var(--astra-ink);
+      box-shadow: inset 0 0 0 1px var(--interaction-edge);
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .tab-hover[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+  .tab-hover[aria-pressed="true"]:focus-visible { outline-color: CanvasText; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --interaction-time: 0ms; }
+}

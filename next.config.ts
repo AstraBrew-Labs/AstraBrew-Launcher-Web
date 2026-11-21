@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/guide", destination: "/zh/docs", permanent: true },
       { source: "/:lang(zh|en)/guide", destination: "/:lang/docs", permanent: true },
-      { source: "/about", destination: "/zh", permanent: true },
-      { source: "/:lang(zh|en)/about", destination: "/:lang", permanent: true },
       { source: "/images/og.png", destination: "/brand/og/home-zh-v1.png", permanent: true },
     ];
   },
