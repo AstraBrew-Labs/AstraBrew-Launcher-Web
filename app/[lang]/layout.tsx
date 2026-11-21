@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { SiteAnalytics } from "@/components/site/site-analytics";
@@ -12,6 +13,16 @@ import { DocumentBootstrap } from "@/components/site/document-bootstrap";
 import "../globals.css";
 import "../theme.css";
 import "../interaction-feedback.css";
+
+// Use public assets so both localized homepages declare the same build-independent URLs.
+export const metadata: Metadata = {
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "16x16 32x32 48x48 96x96" },
+      { url: "/brand/favicon-96.png", type: "image/png", sizes: "96x96" },
+    ],
+  },
+};
 
 async function RegionHint() { return <span hidden data-request-region={await requestRegion()} />; }
 
