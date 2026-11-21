@@ -22,8 +22,9 @@ bun run dev
 
 - **Vercel Web Analytics**：在 Vercel 项目的 **Analytics** 页面点击 **Enable**，确保项目开放系统环境变量（代码用 `VERCEL_ENV=production` 区分生产与预览），然后重新部署。官方 Next.js 集成已放在中英文共享布局，无需另填站点 ID。
 - **Cloudflare Web Analytics**：在 **Web Analytics** 中添加或选择域名，选择手动安装 JS Snippet，把片段里 `data-cf-beacon` 的 `token` 配置为 `CLOUDFLARE_WEB_ANALYTICS_TOKEN`（Vercel 请选择 **Production** 环境），然后重新部署。如果 Cloudflare 已自动注入脚本，请把该变量留空，避免重复统计。
+- **Google Tag Manager**：中英文共享布局在 hydration 后异步加载容器 `GTM-MLXXG558`，无需设置环境变量。GA4、单页导航的页面浏览事件及同意规则均在 GTM 容器内配置；网站代码不额外发送页面浏览或转化事件。
 
-仓库只集成页面访问统计，不发送自定义事件。应用不会在本地开发或 Vercel Preview 中加载这两段统计脚本；手动集成的 Cloudflare 脚本在页面加载后的空闲时段启动，不阻塞首屏。如需排除特定地区或接入同意机制，请在上线前按站点的隐私要求配置。
+应用不会在本地开发或 Vercel Preview 中加载这些统计脚本；手动集成的 Cloudflare 脚本在页面加载后的空闲时段启动。如需排除特定地区或接入同意机制，请在上线前按站点的隐私要求配置。
 
 ## 使用文档
 
